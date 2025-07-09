@@ -29,14 +29,22 @@ function PageInput({
 }) {
   const charsLeft = MAX_CHARS_PER_PAGE - content.length;
 
+  const removeEmojis = (text) => {
+    // Remove all emojis from text
+    return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
+  };
+
   const handleTextChange = (e) => {
-    // Enforce the character limit
-    const newText = e.target.value.slice(0, MAX_CHARS_PER_PAGE);
+    // Remove emojis and enforce character limit
+    const cleanText = removeEmojis(e.target.value);
+    const newText = cleanText.slice(0, MAX_CHARS_PER_PAGE);
     onContentChange(index, newText);
   };
 
   const handleTitleChange = (e) => {
-    const newTitle = e.target.value.slice(0, MAX_CHARS_TITLE);
+    // Remove emojis and enforce character limit
+    const cleanTitle = removeEmojis(e.target.value);
+    const newTitle = cleanTitle.slice(0, MAX_CHARS_TITLE);
     onTitleChange(index, newTitle);
   };
 
@@ -83,6 +91,12 @@ function PageInput({
       </div>
     </div>
   );
+}
+
+// PDF Slide Component - renders individual slides for PDF generation (not used in main UI)
+function PDFSlide({ page, index, totalPages, authorName, backgroundColor, font, showPageNumbers, textColor, secondaryTextColor }) {
+  // This component is only used for PDF generation, not main UI rendering
+  return null;
 }
 
 // Main App Component
@@ -172,6 +186,11 @@ export default function App() {
     return luminance > 0.5 ? "#1e293b" : "#ffffff";
   };
 
+  const removeEmojis = (text) => {
+    // Remove all emojis from text
+    return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
+  };
+
   const generateFilename = () => {
     const firstSlide = pages[0];
     if (!firstSlide) return "slidedeck.pdf";
@@ -223,32 +242,33 @@ export default function App() {
       if (hasTitle) {
         // Layout WITH a title
         doc.setFont(font, "bold");
-        doc.setFontSize(34);
+        doc.setFontSize(32);
         doc.setTextColor(textColor);
         const titleLines = doc.splitTextToSize(
           page.title,
           pageWidth - margin * 2,
         );
-        doc.text(titleLines, pageWidth / 2, pageHeight / 2 - 20, {
+        doc.text(titleLines, pageWidth / 2, pageHeight / 2 - 12, {
           align: "center",
           baseline: "middle",
         });
 
         doc.setFont(font, "normal");
-        doc.setFontSize(22);
+        doc.setFontSize(20);
         doc.setTextColor(textColor);
         const contentLines = doc.splitTextToSize(
           page.content,
           pageWidth - margin * 2,
         );
-        doc.text(contentLines, pageWidth / 2, pageHeight / 2 + 20, {
+        doc.text(contentLines, pageWidth / 2, pageHeight / 2 + 12, {
           align: "center",
           baseline: "middle",
+          lineHeightFactor: 1.4,
         });
       } else {
         // Layout WITHOUT a title (original layout)
         doc.setFont(font, "bold");
-        doc.setFontSize(28);
+        doc.setFontSize(26);
         doc.setTextColor(textColor);
         const textLines = doc.splitTextToSize(
           page.content,
@@ -257,6 +277,7 @@ export default function App() {
         doc.text(textLines, pageWidth / 2, pageHeight / 2, {
           align: "center",
           baseline: "middle",
+          lineHeightFactor: 1.4,
         });
       }
 
@@ -308,7 +329,7 @@ export default function App() {
               <p
                 className={`${isDarkMode ? "text-gray-400" : "text-slate-500"} mt-2`}
               >
-                Keep it professional, no one is watching 👀
+                Keep it professional, no one is watching.
               </p>
             </div>
             <button
@@ -376,7 +397,7 @@ export default function App() {
                   type="text"
                   id="authorName"
                   value={authorName}
-                  onChange={(e) => setAuthorName(e.target.value)}
+                  onChange={(e) => setAuthorName(removeEmojis(e.target.value))}
                   className={`w-full p-3 ${isDarkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-slate-50 border-slate-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
                   placeholder="e.g., Alex Doe"
                 />

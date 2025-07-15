@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-// The 'jspdf' import is removed as it causes a resolution error in this environment.
-// We will access it from the global window object instead.
+import { pdf } from '@react-pdf/renderer';
+import PDFDocument from './PDFDocument';
 import {
   ArrowDownToLine,
   Loader2,
@@ -29,22 +29,15 @@ function PageInput({
 }) {
   const charsLeft = MAX_CHARS_PER_PAGE - content.length;
 
-  const removeEmojis = (text) => {
-    // Remove all emojis from text
-    return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
-  };
-
   const handleTextChange = (e) => {
-    // Remove emojis and enforce character limit
-    const cleanText = removeEmojis(e.target.value);
-    const newText = cleanText.slice(0, MAX_CHARS_PER_PAGE);
+    // Enforce character limit (emojis now supported!)
+    const newText = e.target.value.slice(0, MAX_CHARS_PER_PAGE);
     onContentChange(index, newText);
   };
 
   const handleTitleChange = (e) => {
-    // Remove emojis and enforce character limit
-    const cleanTitle = removeEmojis(e.target.value);
-    const newTitle = cleanTitle.slice(0, MAX_CHARS_TITLE);
+    // Enforce character limit (emojis now supported!)
+    const newTitle = e.target.value.slice(0, MAX_CHARS_TITLE);
     onTitleChange(index, newTitle);
   };
 
@@ -93,12 +86,6 @@ function PageInput({
   );
 }
 
-// PDF Slide Component - renders individual slides for PDF generation (not used in main UI)
-function PDFSlide({ page, index, totalPages, authorName, backgroundColor, font, showPageNumbers, textColor, secondaryTextColor }) {
-  // This component is only used for PDF generation, not main UI rendering
-  return null;
-}
-
 // Main App Component
 export default function App() {
   // State hooks to store user input
@@ -113,23 +100,11 @@ export default function App() {
   const [backgroundColor, setBackgroundColor] = useState("#e0f2fe");
   const [font, setFont] = useState("helvetica");
   const [showPageNumbers, setShowPageNumbers] = useState(true);
-  const [isPdfLibReady, setIsPdfLibReady] = useState(false);
+  const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(() => {
     const savedMode = localStorage.getItem("darkMode");
     return savedMode ? JSON.parse(savedMode) : false;
   });
-
-  useEffect(() => {
-    const script = document.createElement("script");
-    script.src =
-      "https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js";
-    script.async = true;
-    script.onload = () => setIsPdfLibReady(true);
-    document.body.appendChild(script);
-    return () => {
-      document.body.removeChild(script);
-    };
-  }, []);
 
   useEffect(() => {
     localStorage.setItem("darkMode", JSON.stringify(isDarkMode));
@@ -186,11 +161,6 @@ export default function App() {
     return luminance > 0.5 ? "#1e293b" : "#ffffff";
   };
 
-  const removeEmojis = (text) => {
-    // Remove all emojis from text
-    return text.replace(/[\u{1F600}-\u{1F64F}]|[\u{1F300}-\u{1F5FF}]|[\u{1F680}-\u{1F6FF}]|[\u{1F1E0}-\u{1F1FF}]|[\u{2600}-\u{26FF}]|[\u{2700}-\u{27BF}]/gu, '');
-  };
-
   const generateFilename = () => {
     const firstSlide = pages[0];
     if (!firstSlide) return "slidedeck.pdf";
@@ -216,92 +186,39 @@ export default function App() {
     return "slidedeck.pdf";
   };
 
-  const handleGeneratePdf = () => {
-    const { jsPDF } = window.jspdf;
-    if (!jsPDF) {
-      console.error("PDF generation library (jsPDF) not found.");
-      return;
+  const handleGeneratePdf = async () => {
+    setIsGeneratingPdf(true);
+    
+    try {
+      const textColor = getContrastTextColor(backgroundColor);
+      const secondaryTextColor = textColor === "#ffffff" ? "#e2e8f0" : "#64748b";
+
+      const blob = await pdf(
+        <PDFDocument
+          pages={pages}
+          authorName={authorName}
+          backgroundColor={backgroundColor}
+          font={font}
+          showPageNumbers={showPageNumbers}
+          textColor={textColor}
+          secondaryTextColor={secondaryTextColor}
+        />
+      ).toBlob();
+
+      const filename = generateFilename();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+    } finally {
+      setIsGeneratingPdf(false);
     }
-
-    const doc = new jsPDF("l", "mm", [200, 200]);
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const margin = 20;
-
-    const textColor = getContrastTextColor(backgroundColor);
-    const secondaryTextColor = textColor === "#ffffff" ? "#e2e8f0" : "#64748b";
-
-    pages.forEach((page, index) => {
-      if (index > 0) doc.addPage();
-
-      doc.setFillColor(backgroundColor);
-      doc.rect(0, 0, pageWidth, pageHeight, "F");
-
-      const hasTitle = page.title && page.title.trim() !== "";
-
-      if (hasTitle) {
-        // Layout WITH a title
-        doc.setFont(font, "bold");
-        doc.setFontSize(32);
-        doc.setTextColor(textColor);
-        const titleLines = doc.splitTextToSize(
-          page.title,
-          pageWidth - margin * 2,
-        );
-        doc.text(titleLines, pageWidth / 2, pageHeight / 2 - 12, {
-          align: "center",
-          baseline: "middle",
-        });
-
-        doc.setFont(font, "normal");
-        doc.setFontSize(20);
-        doc.setTextColor(textColor);
-        const contentLines = doc.splitTextToSize(
-          page.content,
-          pageWidth - margin * 2,
-        );
-        doc.text(contentLines, pageWidth / 2, pageHeight / 2 + 12, {
-          align: "center",
-          baseline: "middle",
-          lineHeightFactor: 1.4,
-        });
-      } else {
-        // Layout WITHOUT a title (original layout)
-        doc.setFont(font, "bold");
-        doc.setFontSize(26);
-        doc.setTextColor(textColor);
-        const textLines = doc.splitTextToSize(
-          page.content,
-          pageWidth - margin * 2,
-        );
-        doc.text(textLines, pageWidth / 2, pageHeight / 2, {
-          align: "center",
-          baseline: "middle",
-          lineHeightFactor: 1.4,
-        });
-      }
-
-      doc.setFont(font, "normal");
-      doc.setFontSize(10);
-      doc.setTextColor(secondaryTextColor);
-      const bottomMargin = 10;
-      doc.text(authorName, pageWidth - 15, pageHeight - bottomMargin, {
-        align: "right",
-      });
-
-      if (showPageNumbers) {
-        doc.setFont(font, "normal");
-        doc.setFontSize(10);
-        doc.setTextColor(secondaryTextColor);
-        const pageNumberText = `${index + 1} / ${pages.length}`;
-        doc.text(pageNumberText, 15, pageHeight - bottomMargin, {
-          align: "left",
-        });
-      }
-    });
-
-    const filename = generateFilename();
-    doc.save(filename);
   };
 
   return (
@@ -329,7 +246,7 @@ export default function App() {
               <p
                 className={`${isDarkMode ? "text-gray-400" : "text-slate-500"} mt-2`}
               >
-                Keep it professional, no one is watching.
+                Now with emoji support! Express yourself professionally.
               </p>
             </div>
             <button
@@ -397,7 +314,7 @@ export default function App() {
                   type="text"
                   id="authorName"
                   value={authorName}
-                  onChange={(e) => setAuthorName(removeEmojis(e.target.value))}
+                  onChange={(e) => setAuthorName(e.target.value)}
                   className={`w-full p-3 ${isDarkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-slate-50 border-slate-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
                   placeholder="e.g., Alex Doe"
                 />
@@ -480,19 +397,19 @@ export default function App() {
           >
             <button
               onClick={handleGeneratePdf}
-              disabled={!isPdfLibReady}
+              disabled={isGeneratingPdf}
               className="w-full flex items-center justify-center bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 active:scale-95 transition-all duration-200 ease-in-out shadow-lg shadow-blue-500/30 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:bg-slate-400 disabled:shadow-none disabled:cursor-not-allowed"
             >
-              {isPdfLibReady ? (
+              {isGeneratingPdf ? (
+                <>
+                  <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                  Generating PDF...
+                </>
+              ) : (
                 <>
                   <ArrowDownToLine className="w-5 h-5 mr-3" />
                   Generate & Download PDF ({pages.length}{" "}
                   {pages.length === 1 ? "Slide" : "Slides"})
-                </>
-              ) : (
-                <>
-                  <Loader2 className="w-5 h-5 mr-3 animate-spin" />
-                  Loading Library...
                 </>
               )}
             </button>

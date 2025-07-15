@@ -26,10 +26,10 @@ Font.register({
   ]
 });
 
-// Register emoji font for Unicode support
-Font.register({
-  family: 'NotoEmoji',
-  src: 'https://fonts.gstatic.com/s/notocoloremoji/v30/Yq6P-KqIXTD0t4D9z1ESnKM3-HpFab5s79iz64w.woff2'
+// Register emoji source for image-based emoji rendering
+Font.registerEmojiSource({
+  format: 'png',
+  url: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/',
 });
 
 const createStyles = (backgroundColor, textColor, secondaryTextColor, font) => StyleSheet.create({

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Document, Page, Text, StyleSheet, Font } from '@react-pdf/renderer';
+import { Document, Page, Text, StyleSheet, Font, Image } from '@react-pdf/renderer';
 import { getContrastTextColor } from './utils/colorUtils';
 
 // Register fonts with emoji support
@@ -86,6 +86,7 @@ const createStyles = (backgroundColor, textColor, secondaryTextColor, font) => S
 
 const PDFSlide = ({ page, index, totalPages, authorName, showPageNumbers, styles, font }) => {
   const hasTitle = page.title && page.title.trim() !== '';
+  const hasContent = page.content && page.content.trim() !== '';
   
   // Calculate text colors for this slide's background
   const slideBackgroundColor = page.backgroundColor;
@@ -128,10 +129,36 @@ const PDFSlide = ({ page, index, totalPages, authorName, showPageNumbers, styles
       {hasTitle ? (
         <>
           <Text style={slideTitleStyle}>{page.title}</Text>
-          <Text style={slideContentStyle}>{page.content}</Text>
+          {page.image && (
+            <Image 
+              src={page.image} 
+              style={{
+                maxWidth: 300,
+                maxHeight: 200,
+                marginVertical: 20,
+                objectFit: 'contain',
+                alignSelf: 'center',
+              }}
+            />
+          )}
+          {hasContent && <Text style={slideContentStyle}>{page.content}</Text>}
         </>
       ) : (
-        <Text style={slideContentWithoutTitleStyle}>{page.content}</Text>
+        <>
+          {page.image && (
+            <Image 
+              src={page.image} 
+              style={{
+                maxWidth: 350,
+                maxHeight: 250,
+                marginVertical: 20,
+                objectFit: 'contain',
+                alignSelf: 'center',
+              }}
+            />
+          )}
+          {hasContent && <Text style={slideContentWithoutTitleStyle}>{page.content}</Text>}
+        </>
       )}
       
       {showPageNumbers && (

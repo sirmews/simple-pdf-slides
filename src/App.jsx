@@ -23,6 +23,7 @@ export default function App() {
       content:
         "Create beautiful, slide-deck style PDFs for your social media posts.",
       backgroundColor: "#e0f2fe",
+      image: null,
     },
   ]);
   const [authorName, setAuthorName] = useState("Your Name");
@@ -32,7 +33,7 @@ export default function App() {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   const handleAddPage = () => {
-    setPages([...pages, { title: "", content: "", backgroundColor: "#e0f2fe" }]);
+    setPages([...pages, { title: "", content: "", backgroundColor: "#e0f2fe", image: null }]);
   };
 
   const handleRemovePage = (indexToRemove) => {
@@ -54,6 +55,24 @@ export default function App() {
   const handlePageBackgroundColorChange = (index, newColor) => {
     const updatedPages = [...pages];
     updatedPages[index].backgroundColor = newColor;
+    setPages(updatedPages);
+  };
+
+  const handlePageImageChange = (index, imageFile) => {
+    if (imageFile) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const updatedPages = [...pages];
+        updatedPages[index].image = e.target.result; // This will be a data URL
+        setPages(updatedPages);
+      };
+      reader.readAsDataURL(imageFile);
+    }
+  };
+
+  const handlePageImageRemove = (index) => {
+    const updatedPages = [...pages];
+    updatedPages[index].image = null;
     setPages(updatedPages);
   };
 
@@ -168,9 +187,12 @@ export default function App() {
                   title={page.title}
                   content={page.content}
                   backgroundColor={page.backgroundColor}
+                  image={page.image}
                   onContentChange={handlePageContentChange}
                   onTitleChange={handlePageTitleChange}
                   onBackgroundColorChange={handlePageBackgroundColorChange}
+                  onImageChange={handlePageImageChange}
+                  onImageRemove={handlePageImageRemove}
                   onRemove={handleRemovePage}
                   canBeRemoved={pages.length > 1}
                   isDarkMode={isDarkMode}

@@ -1,4 +1,4 @@
-import { XCircle, Palette } from "lucide-react";
+import { XCircle, Palette, Upload, Image as ImageIcon } from "lucide-react";
 
 const MAX_CHARS_PER_PAGE = 250;
 const MAX_CHARS_TITLE = 50;
@@ -8,9 +8,12 @@ export default function PageInput({
   title,
   content,
   backgroundColor,
+  image,
   onContentChange,
   onTitleChange,
   onBackgroundColorChange,
+  onImageChange,
+  onImageRemove,
   onRemove,
   canBeRemoved,
   isDarkMode,
@@ -83,6 +86,59 @@ export default function PageInput({
             style={{ backgroundColor: backgroundColor }}
           ></div>
         </div>
+      </div>
+
+      {/* Image Upload */}
+      <div className="space-y-2">
+        <label className={`flex items-center text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}>
+          <ImageIcon className="w-4 h-4 mr-2" />
+          Image (Optional)
+        </label>
+        
+        {image ? (
+          <div className="relative">
+            <img 
+              src={image} 
+              alt={`Slide ${index + 1} image`}
+              className="w-full max-h-64 object-contain rounded-lg border bg-gray-50"
+              style={{ aspectRatio: 'auto' }}
+            />
+            <button
+              onClick={() => onImageRemove(index)}
+              className="absolute top-2 right-2 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 transition-colors"
+              title="Remove image"
+            >
+              <XCircle className="w-4 h-4" />
+            </button>
+          </div>
+        ) : (
+          <div className="relative">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => {
+                const file = e.target.files[0];
+                if (file) onImageChange(index, file);
+              }}
+              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+            />
+            <div className={`flex items-center justify-center p-8 border-2 border-dashed rounded-lg transition-colors ${
+              isDarkMode 
+                ? "border-gray-600 hover:border-gray-500 bg-gray-700/50" 
+                : "border-gray-300 hover:border-gray-400 bg-gray-50"
+            }`}>
+              <div className="text-center">
+                <Upload className={`w-8 h-8 mx-auto mb-2 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`} />
+                <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                  Click to upload an image
+                </p>
+                <p className={`text-xs ${isDarkMode ? "text-gray-500" : "text-gray-500"}`}>
+                  PNG, JPG, GIF up to 10MB
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <textarea

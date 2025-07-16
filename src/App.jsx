@@ -1,90 +1,18 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { pdf } from '@react-pdf/renderer';
 import PDFDocument from './PDFDocument';
+import PageInput from './components/PageInput';
+import { useDarkMode } from './hooks/useDarkMode';
 import {
   ArrowDownToLine,
   Loader2,
   Moon,
-  Palette,
   PlusCircle,
   Sun,
   Type,
   User,
-  XCircle,
 } from "lucide-react";
 
-const MAX_CHARS_PER_PAGE = 250;
-const MAX_CHARS_TITLE = 50;
-
-// A new component to handle the input for a single page.
-function PageInput({
-  index,
-  title,
-  content,
-  onContentChange,
-  onTitleChange,
-  onRemove,
-  canBeRemoved,
-  isDarkMode,
-}) {
-  const charsLeft = MAX_CHARS_PER_PAGE - content.length;
-
-  const handleTextChange = (e) => {
-    // Enforce character limit (emojis now supported!)
-    const newText = e.target.value.slice(0, MAX_CHARS_PER_PAGE);
-    onContentChange(index, newText);
-  };
-
-  const handleTitleChange = (e) => {
-    // Enforce character limit (emojis now supported!)
-    const newTitle = e.target.value.slice(0, MAX_CHARS_TITLE);
-    onTitleChange(index, newTitle);
-  };
-
-  return (
-    <div
-      className={`relative p-4 ${isDarkMode ? "bg-gray-700" : "bg-slate-50"} border ${isDarkMode ? "border-gray-600" : "border-slate-200"} rounded-lg transition-all duration-300 space-y-3`}
-    >
-      <div className="flex justify-between items-center">
-        <label
-          className={`text-sm font-bold ${isDarkMode ? "text-gray-300" : "text-slate-600"}`}
-        >
-          Slide {index + 1}
-        </label>
-        {canBeRemoved && (
-          <button
-            onClick={() => onRemove(index)}
-            className={`${isDarkMode ? "text-gray-400 hover:text-red-400" : "text-slate-400 hover:text-red-500"} transition-colors`}
-            title="Remove Slide"
-          >
-            <XCircle className="w-5 h-5" />
-          </button>
-        )}
-      </div>
-
-      {/* Optional Title Input */}
-      <input
-        type="text"
-        value={title}
-        onChange={handleTitleChange}
-        className={`w-full p-2 ${isDarkMode ? "bg-gray-600 border-gray-500 text-white placeholder-gray-400" : "bg-white border-slate-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
-        placeholder="Optional Title..."
-      />
-
-      <textarea
-        value={content}
-        onChange={handleTextChange}
-        className={`w-full h-32 p-3 ${isDarkMode ? "bg-gray-600 border-gray-500 text-white placeholder-gray-400" : "bg-white border-slate-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 resize-none`}
-        placeholder={`Write slide ${index + 1} content here...`}
-      />
-      <div
-        className={`text-right text-sm mt-1 ${charsLeft < 25 ? "text-red-500" : isDarkMode ? "text-gray-400" : "text-slate-500"}`}
-      >
-        {charsLeft} characters remaining
-      </div>
-    </div>
-  );
-}
 
 // Main App Component
 export default function App() {
@@ -94,28 +22,17 @@ export default function App() {
       title: "Welcome!",
       content:
         "Create beautiful, slide-deck style PDFs for your social media posts.",
+      backgroundColor: "#e0f2fe",
     },
   ]);
   const [authorName, setAuthorName] = useState("Your Name");
-  const [backgroundColor, setBackgroundColor] = useState("#e0f2fe");
   const [font, setFont] = useState("helvetica");
   const [showPageNumbers, setShowPageNumbers] = useState(true);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    const savedMode = localStorage.getItem("darkMode");
-    return savedMode ? JSON.parse(savedMode) : false;
-  });
-
-  useEffect(() => {
-    localStorage.setItem("darkMode", JSON.stringify(isDarkMode));
-  }, [isDarkMode]);
-
-  const toggleDarkMode = () => {
-    setIsDarkMode(!isDarkMode);
-  };
+  const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   const handleAddPage = () => {
-    setPages([...pages, { title: "", content: "" }]);
+    setPages([...pages, { title: "", content: "", backgroundColor: "#e0f2fe" }]);
   };
 
   const handleRemovePage = (indexToRemove) => {
@@ -134,32 +51,12 @@ export default function App() {
     setPages(updatedPages);
   };
 
-  const hexToRgb = (hex) => {
-    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-    return result
-      ? {
-          r: parseInt(result[1], 16),
-          g: parseInt(result[2], 16),
-          b: parseInt(result[3], 16),
-        }
-      : null;
+  const handlePageBackgroundColorChange = (index, newColor) => {
+    const updatedPages = [...pages];
+    updatedPages[index].backgroundColor = newColor;
+    setPages(updatedPages);
   };
 
-  const getLuminance = (r, g, b) => {
-    const [rs, gs, bs] = [r, g, b].map((c) => {
-      c = c / 255;
-      return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-    });
-    return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
-  };
-
-  const getContrastTextColor = (backgroundColor) => {
-    const rgb = hexToRgb(backgroundColor);
-    if (!rgb) return "#1e293b";
-
-    const luminance = getLuminance(rgb.r, rgb.g, rgb.b);
-    return luminance > 0.5 ? "#1e293b" : "#ffffff";
-  };
 
   const generateFilename = () => {
     const firstSlide = pages[0];
@@ -190,18 +87,12 @@ export default function App() {
     setIsGeneratingPdf(true);
     
     try {
-      const textColor = getContrastTextColor(backgroundColor);
-      const secondaryTextColor = textColor === "#ffffff" ? "#e2e8f0" : "#64748b";
-
       const blob = await pdf(
         <PDFDocument
           pages={pages}
           authorName={authorName}
-          backgroundColor={backgroundColor}
           font={font}
           showPageNumbers={showPageNumbers}
-          textColor={textColor}
-          secondaryTextColor={secondaryTextColor}
         />
       ).toBlob();
 
@@ -276,8 +167,10 @@ export default function App() {
                   index={index}
                   title={page.title}
                   content={page.content}
+                  backgroundColor={page.backgroundColor}
                   onContentChange={handlePageContentChange}
                   onTitleChange={handlePageTitleChange}
+                  onBackgroundColorChange={handlePageBackgroundColorChange}
                   onRemove={handleRemovePage}
                   canBeRemoved={pages.length > 1}
                   isDarkMode={isDarkMode}
@@ -320,34 +213,6 @@ export default function App() {
                 />
               </div>
 
-              <div className="space-y-2">
-                <label
-                  htmlFor="backgroundColor"
-                  className={`flex items-center text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}
-                >
-                  <Palette className="w-4 h-4 mr-2" />
-                  Background Color
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    readOnly
-                    value={backgroundColor}
-                    className={`w-full p-3 ${isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-slate-50 border-slate-300"} rounded-lg`}
-                  />
-                  <input
-                    type="color"
-                    id="backgroundColor"
-                    value={backgroundColor}
-                    onChange={(e) => setBackgroundColor(e.target.value)}
-                    className="absolute top-0 right-0 h-full w-12 opacity-0 cursor-pointer"
-                  />
-                  <div
-                    className={`absolute top-1/2 right-3 transform -translate-y-1/2 w-6 h-6 rounded-md border ${isDarkMode ? "border-gray-600" : "border-slate-300"}`}
-                    style={{ backgroundColor: backgroundColor }}
-                  ></div>
-                </div>
-              </div>
 
               <div className="space-y-2">
                 <label

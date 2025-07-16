@@ -1,5 +1,6 @@
 import React from 'react';
 import { Document, Page, Text, StyleSheet, Font } from '@react-pdf/renderer';
+import { getContrastTextColor } from './utils/colorUtils';
 
 // Register fonts with emoji support
 Font.register({
@@ -83,26 +84,62 @@ const createStyles = (backgroundColor, textColor, secondaryTextColor, font) => S
   },
 });
 
-const PDFSlide = ({ page, index, totalPages, authorName, showPageNumbers, styles }) => {
+const PDFSlide = ({ page, index, totalPages, authorName, showPageNumbers, styles, font }) => {
   const hasTitle = page.title && page.title.trim() !== '';
+  
+  // Calculate text colors for this slide's background
+  const slideBackgroundColor = page.backgroundColor;
+  const slideTextColor = getContrastTextColor(slideBackgroundColor);
+  const slideSecondaryTextColor = slideTextColor === "#ffffff" ? "#e2e8f0" : "#64748b";
+  
+  // Create styles with this slide's colors
+  const slidePageStyle = {
+    ...styles.page,
+    backgroundColor: slideBackgroundColor,
+  };
+  
+  const slideTitleStyle = {
+    ...styles.title,
+    color: slideTextColor,
+  };
+  
+  const slideContentStyle = {
+    ...styles.content,
+    color: slideTextColor,
+  };
+  
+  const slideContentWithoutTitleStyle = {
+    ...styles.contentWithoutTitle,
+    color: slideTextColor,
+  };
+  
+  const slideAuthorStyle = {
+    ...styles.authorName,
+    color: slideSecondaryTextColor,
+  };
+  
+  const slidePageNumberStyle = {
+    ...styles.pageNumber,
+    color: slideSecondaryTextColor,
+  };
 
   return (
-    <Page size={[595, 595]} style={styles.page}>
+    <Page size={[595, 595]} style={slidePageStyle}>
       {hasTitle ? (
         <>
-          <Text style={styles.title}>{page.title}</Text>
-          <Text style={styles.content}>{page.content}</Text>
+          <Text style={slideTitleStyle}>{page.title}</Text>
+          <Text style={slideContentStyle}>{page.content}</Text>
         </>
       ) : (
-        <Text style={styles.contentWithoutTitle}>{page.content}</Text>
+        <Text style={slideContentWithoutTitleStyle}>{page.content}</Text>
       )}
       
       {showPageNumbers && (
-        <Text style={styles.pageNumber}>
+        <Text style={slidePageNumberStyle}>
           {index + 1} / {totalPages}
         </Text>
       )}
-      <Text style={styles.authorName}>{authorName}</Text>
+      <Text style={slideAuthorStyle}>{authorName}</Text>
     </Page>
   );
 };
@@ -121,6 +158,7 @@ const PDFDocument = ({ pages, authorName, backgroundColor, font, showPageNumbers
           authorName={authorName}
           showPageNumbers={showPageNumbers}
           styles={styles}
+          font={font}
         />
       ))}
     </Document>

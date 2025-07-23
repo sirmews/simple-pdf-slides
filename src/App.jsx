@@ -227,19 +227,19 @@ export default function App() {
               <h1
                 className={`text-2xl sm:text-3xl font-bold ${isDarkMode ? "text-white" : "text-slate-800"}`}
               >
-                Kinda professional carousels
+                Kinda professional 🚀 carousels
               </h1>
               <p
                 className={`${isDarkMode ? "text-gray-400" : "text-slate-500"} mt-2`}
               >
-                Y'know those awful carousels we're forced to navigate in LinkedIn? Be the problem, not the solution.
+                Y'know those awful carousels we're forced to navigate in LinkedIn?
                 <br />
-                Here's a solution
+                Be the problem, not the solution. Here's a solution
               </p>
               <p
                 className={`${isDarkMode ? "text-gray-400" : "text-slate-500"} mt-2`}
               >
-                Now with emoji support! Express yourself professionally.
+                Now with emoji support! Express yourself professionally 🚀
               </p>
             </div>
             <button

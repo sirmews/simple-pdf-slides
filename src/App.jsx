@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { pdf } from '@react-pdf/renderer';
 import PDFDocument from './PDFDocument';
 import PageInput from './components/PageInput';
@@ -32,6 +32,7 @@ export default function App() {
   const [showPageNumbers, setShowPageNumbers] = useState(true);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const { isDarkMode, toggleDarkMode } = useDarkMode();
+
 
   const handleAddPage = () => {
     setPages([...pages, { title: "", content: "", backgroundColor: "#e0f2fe", image: null, template: "simple" }]);
@@ -312,8 +313,20 @@ export default function App() {
           </div>
         </div>
 
+        {/* Ko-fi Support Button */}
+        <div className="flex justify-center mt-6">
+          <a href='https://ko-fi.com/A0A01HT0RG' target='_blank' rel='noopener noreferrer'>
+            <img 
+              height='36' 
+              style={{border: '0px', height: '36px'}} 
+              src='https://storage.ko-fi.com/cdn/kofi6.png?v=6' 
+              alt='Buy Me a Coffee at ko-fi.com' 
+            />
+          </a>
+        </div>
+
         <footer
-          className={`text-center mt-8 text-sm ${isDarkMode ? "text-gray-400" : "text-slate-500"}`}
+          className={`text-center mt-4 text-sm ${isDarkMode ? "text-gray-400" : "text-slate-500"}`}
         >
           <p>&copy; 2025 PDF Slide Generator. Built with vibes by Nav.</p>
         </footer>

@@ -87,19 +87,37 @@ export default function PageInput({
         <div className="relative">
           <input
             type="text"
-            readOnly
             value={backgroundColor}
-            className={`w-full p-2 ${isDarkMode ? "bg-gray-600 border-gray-500 text-white" : "bg-white border-slate-300"} rounded-lg`}
+            onChange={(e) => {
+              const value = e.target.value;
+              // Allow typing and validate hex color format
+              if (value.match(/^#[0-9A-Fa-f]{0,6}$/) || value === '') {
+                onBackgroundColorChange(index, value);
+              }
+            }}
+            onBlur={(e) => {
+              // Ensure valid hex color on blur
+              const value = e.target.value;
+              if (!value.match(/^#[0-9A-Fa-f]{6}$/)) {
+                // If invalid, revert to previous valid color
+                onBackgroundColorChange(index, backgroundColor);
+              }
+            }}
+            className={`w-full p-2 pr-12 ${isDarkMode ? "bg-gray-600 border-gray-500 text-white" : "bg-white border-slate-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
+            placeholder="#e0f2fe"
           />
           <input
+            id={`color-picker-${index}`}
             type="color"
             value={backgroundColor}
             onChange={(e) => onBackgroundColorChange(index, e.target.value)}
             className="absolute top-0 right-0 h-full w-12 opacity-0 cursor-pointer"
           />
           <div
-            className={`absolute top-1/2 right-3 transform -translate-y-1/2 w-6 h-6 rounded-md border ${isDarkMode ? "border-gray-600" : "border-slate-300"}`}
+            className={`absolute top-1/2 right-3 transform -translate-y-1/2 w-6 h-6 rounded-md border ${isDarkMode ? "border-gray-600" : "border-slate-300"} cursor-pointer`}
             style={{ backgroundColor: backgroundColor }}
+            onClick={() => document.getElementById(`color-picker-${index}`).click()}
+            title="Click to open color picker"
           ></div>
         </div>
       </div>

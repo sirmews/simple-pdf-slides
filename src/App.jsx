@@ -24,6 +24,7 @@ export default function App() {
         "Create beautiful, slide-deck style PDFs for your social media posts.",
       backgroundColor: "#e0f2fe",
       image: null,
+      template: "simple",
     },
   ]);
   const [authorName, setAuthorName] = useState("Your Name");
@@ -33,7 +34,7 @@ export default function App() {
   const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   const handleAddPage = () => {
-    setPages([...pages, { title: "", content: "", backgroundColor: "#e0f2fe", image: null }]);
+    setPages([...pages, { title: "", content: "", backgroundColor: "#e0f2fe", image: null, template: "simple" }]);
   };
 
   const handleRemovePage = (indexToRemove) => {
@@ -73,6 +74,12 @@ export default function App() {
   const handlePageImageRemove = (index) => {
     const updatedPages = [...pages];
     updatedPages[index].image = null;
+    setPages(updatedPages);
+  };
+
+  const handlePageTemplateChange = (index, newTemplate) => {
+    const updatedPages = [...pages];
+    updatedPages[index].template = newTemplate;
     setPages(updatedPages);
   };
 
@@ -188,11 +195,13 @@ export default function App() {
                   content={page.content}
                   backgroundColor={page.backgroundColor}
                   image={page.image}
+                  template={page.template}
                   onContentChange={handlePageContentChange}
                   onTitleChange={handlePageTitleChange}
                   onBackgroundColorChange={handlePageBackgroundColorChange}
                   onImageChange={handlePageImageChange}
                   onImageRemove={handlePageImageRemove}
+                  onTemplateChange={handlePageTemplateChange}
                   onRemove={handleRemovePage}
                   canBeRemoved={pages.length > 1}
                   isDarkMode={isDarkMode}

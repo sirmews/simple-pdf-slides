@@ -1,4 +1,5 @@
 import { XCircle, Palette, Upload, Image as ImageIcon } from "lucide-react";
+import TemplateSelector from "./TemplateSelector";
 
 const MAX_CHARS_PER_PAGE = 250;
 const MAX_CHARS_TITLE = 50;
@@ -9,11 +10,13 @@ export default function PageInput({
   content,
   backgroundColor,
   image,
+  template,
   onContentChange,
   onTitleChange,
   onBackgroundColorChange,
   onImageChange,
   onImageRemove,
+  onTemplateChange,
   onRemove,
   canBeRemoved,
   isDarkMode,
@@ -61,6 +64,18 @@ export default function PageInput({
         className={`w-full p-2 ${isDarkMode ? "bg-gray-600 border-gray-500 text-white placeholder-gray-400" : "bg-white border-slate-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
         placeholder="Optional Title..."
       />
+
+      {/* Template Selector */}
+      <div className="space-y-2">
+        <label className={`flex items-center text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}>
+          Template
+        </label>
+        <TemplateSelector 
+          selectedTemplate={template || "simple"}
+          onTemplateChange={(templateId) => onTemplateChange(index, templateId)}
+          size={64}
+        />
+      </div>
 
       {/* Background Color Picker */}
       <div className="space-y-2">

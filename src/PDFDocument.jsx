@@ -1,5 +1,5 @@
 import React from 'react';
-import { Document, Page, Text, StyleSheet, Font, Image } from '@react-pdf/renderer';
+import { Document, Page, Text, StyleSheet, Font, Image, View } from '@react-pdf/renderer';
 import { getContrastTextColor } from './utils/colorUtils';
 
 // Register fonts with emoji support
@@ -87,6 +87,7 @@ const createStyles = (backgroundColor, textColor, secondaryTextColor, font) => S
 const PDFSlide = ({ page, index, totalPages, authorName, showPageNumbers, styles, font }) => {
   const hasTitle = page.title && page.title.trim() !== '';
   const hasContent = page.content && page.content.trim() !== '';
+  const template = page.template || 'simple';
   
   // Calculate text colors for this slide's background
   const slideBackgroundColor = page.backgroundColor;
@@ -124,8 +125,9 @@ const PDFSlide = ({ page, index, totalPages, authorName, showPageNumbers, styles
     color: slideSecondaryTextColor,
   };
 
-  return (
-    <Page size={[595, 595]} style={slidePageStyle}>
+  // Render based on template
+  const renderSimpleTemplate = () => (
+    <>
       {hasTitle ? (
         <>
           <Text style={slideTitleStyle}>{page.title}</Text>
@@ -160,6 +162,74 @@ const PDFSlide = ({ page, index, totalPages, authorName, showPageNumbers, styles
           {hasContent && <Text style={slideContentWithoutTitleStyle}>{page.content}</Text>}
         </>
       )}
+    </>
+  );
+
+  const renderSplitTemplate = () => (
+    <View style={{
+      display: 'flex',
+      flexDirection: 'row',
+      width: '100%',
+      height: '100%',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      paddingHorizontal: 20,
+    }}>
+      {/* Left Column - Text Content */}
+      <View style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'flex-start',
+        paddingRight: 20,
+      }}>
+        {hasTitle && (
+          <Text style={{
+            ...slideTitleStyle, 
+            textAlign: 'left', 
+            marginBottom: 15,
+            fontSize: 28,
+          }}>
+            {page.title}
+          </Text>
+        )}
+        {hasContent && (
+          <Text style={{
+            ...slideContentStyle,
+            textAlign: 'left',
+            fontSize: font === 'courier' ? 16 : 18,
+            lineHeight: 1.5,
+          }}>
+            {page.content}
+          </Text>
+        )}
+      </View>
+      
+      {/* Right Column - Image */}
+      <View style={{
+        flex: 1,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+        {page.image && (
+          <Image 
+            src={page.image} 
+            style={{
+              maxWidth: 250,
+              maxHeight: 300,
+              objectFit: 'contain',
+            }}
+          />
+        )}
+      </View>
+    </View>
+  );
+
+  return (
+    <Page size={[595, 595]} style={slidePageStyle}>
+      {template === 'split' ? renderSplitTemplate() : renderSimpleTemplate()}
       
       {showPageNumbers && (
         <Text style={slidePageNumberStyle}>

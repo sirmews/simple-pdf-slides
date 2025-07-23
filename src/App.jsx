@@ -227,7 +227,7 @@ export default function App() {
               <h1
                 className={`text-2xl sm:text-3xl font-bold ${isDarkMode ? "text-white" : "text-slate-800"}`}
               >
-                Kinda professional 🚀 carousels
+                Kinda professional carousels
               </h1>
               <p
                 className={`${isDarkMode ? "text-gray-400" : "text-slate-500"} mt-2`}

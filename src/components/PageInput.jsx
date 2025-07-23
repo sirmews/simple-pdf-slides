@@ -37,7 +37,7 @@ export default function PageInput({
 
   return (
     <div
-      className={`relative p-4 ${isDarkMode ? "bg-gray-700" : "bg-slate-50"} border ${isDarkMode ? "border-gray-600" : "border-slate-200"} rounded-lg transition-all duration-300 space-y-3`}
+      className={`relative p-4 ${isDarkMode ? "bg-gray-800" : "bg-gray-50"} border ${isDarkMode ? "border-gray-600" : "border-gray-200"} rounded-lg transition-colors duration-200 space-y-3`}
     >
       <div className="flex justify-between items-center">
         <label
@@ -61,7 +61,7 @@ export default function PageInput({
         type="text"
         value={title}
         onChange={handleTitleChange}
-        className={`w-full p-2 ${isDarkMode ? "bg-gray-600 border-gray-500 text-white placeholder-gray-400" : "bg-white border-slate-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
+        className={`w-full p-2 ${isDarkMode ? "bg-gray-700 border-gray-500 text-white placeholder-gray-400" : "bg-white border-gray-300"} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
         placeholder="Optional Title..."
       />
 
@@ -103,7 +103,7 @@ export default function PageInput({
                 onBackgroundColorChange(index, backgroundColor);
               }
             }}
-            className={`w-full p-2 pr-12 ${isDarkMode ? "bg-gray-600 border-gray-500 text-white" : "bg-white border-slate-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
+            className={`w-full p-2 pr-12 ${isDarkMode ? "bg-gray-700 border-gray-500 text-white" : "bg-white border-gray-300"} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
             placeholder="#e0f2fe"
           />
           <input
@@ -178,7 +178,7 @@ export default function PageInput({
       <textarea
         value={content}
         onChange={handleTextChange}
-        className={`w-full h-32 p-3 ${isDarkMode ? "bg-gray-600 border-gray-500 text-white placeholder-gray-400" : "bg-white border-slate-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 resize-none`}
+        className={`w-full h-32 p-3 ${isDarkMode ? "bg-gray-700 border-gray-500 text-white placeholder-gray-400" : "bg-white border-gray-300"} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 resize-none`}
         placeholder={`Write slide ${index + 1} content here...`}
       />
       <div

@@ -218,7 +218,7 @@ export default function App() {
     >
       <div className="w-full max-w-2xl mx-auto p-4 sm:p-6 md:p-8">
         <div
-          className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-2xl shadow-2xl ${isDarkMode ? "shadow-black/60" : "shadow-slate-300/60"} transition-colors duration-200`}
+          className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-lg border ${isDarkMode ? "border-gray-700" : "border-gray-200"} transition-colors duration-200`}
         >
           <div
             className={`p-6 md:p-8 border-b ${isDarkMode ? "border-gray-700" : "border-slate-200"} flex justify-between items-center`}
@@ -313,7 +313,7 @@ export default function App() {
                   id="authorName"
                   value={authorName}
                   onChange={(e) => setAuthorName(e.target.value)}
-                  className={`w-full p-3 ${isDarkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-slate-50 border-slate-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200`}
+                  className={`w-full p-3 ${isDarkMode ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400" : "bg-gray-50 border-gray-300"} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
                   placeholder="e.g., Alex Doe"
                 />
               </div>
@@ -331,7 +331,7 @@ export default function App() {
                   id="font"
                   value={font}
                   onChange={(e) => setFont(e.target.value)}
-                  className={`w-full p-3 ${isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-slate-50 border-slate-300"} rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-200 appearance-none bg-no-repeat bg-right pr-8`}
+                  className={`w-full p-3 ${isDarkMode ? "bg-gray-700 border-gray-600 text-white" : "bg-gray-50 border-gray-300"} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 appearance-none bg-no-repeat bg-right pr-8`}
                   style={{
                     backgroundImage: `url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23${isDarkMode ? "ffffff" : "6b7280"}' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e")`,
                     backgroundPosition: "right 0.5rem center",
@@ -368,7 +368,7 @@ export default function App() {
             <button
               onClick={handleGeneratePdf}
               disabled={isGeneratingPdf}
-              className="w-full flex items-center justify-center bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 active:scale-95 transition-all duration-200 ease-in-out shadow-lg shadow-blue-500/30 focus:outline-none focus:ring-4 focus:ring-blue-300 disabled:bg-slate-400 disabled:shadow-none disabled:cursor-not-allowed"
+              className="w-full flex items-center justify-center bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:bg-slate-400 disabled:cursor-not-allowed"
             >
               {isGeneratingPdf ? (
                 <>

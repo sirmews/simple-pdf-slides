@@ -169,10 +169,10 @@ const TemplateSelector = ({ selectedTemplate, onTemplateChange, size = 48 }) => 
           key={template.id}
           onClick={() => onTemplateChange(template.id)}
           className={`
-            flex flex-col items-center gap-1 p-2 rounded-lg border transition-all
+            flex flex-col items-center gap-1 p-2 rounded-md border transition-colors
             ${selectedTemplate === template.id
               ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-              : "border-gray-200 hover:border-gray-300 dark:border-gray-700 dark:hover:border-gray-600"
+              : "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500"
             }
           `}
           title={template.description}

@@ -1,4 +1,4 @@
-import { XCircle, Palette, Upload, Image as ImageIcon } from "lucide-react";
+import { XCircle, Palette, Upload, Image as ImageIcon, Layout } from "lucide-react";
 import TemplateSelector from "./TemplateSelector";
 
 const MAX_CHARS_PER_PAGE = 250;
@@ -49,7 +49,7 @@ export default function PageInput({
           <button
             onClick={() => onRemove(index)}
             className={`${isDarkMode ? "text-gray-400 hover:text-red-400" : "text-slate-400 hover:text-red-500"} transition-colors`}
-            title="Remove Slide"
+            title={index === 0 ? "Clear Slide Content" : "Remove Slide"}
           >
             <XCircle className="w-5 h-5" />
           </button>
@@ -68,6 +68,7 @@ export default function PageInput({
       {/* Template Selector */}
       <div className="space-y-2">
         <label className={`flex items-center text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}>
+          <Layout className="w-4 h-4 mr-2" />
           Template
         </label>
         <TemplateSelector 

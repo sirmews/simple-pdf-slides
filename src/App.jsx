@@ -16,22 +16,78 @@ import {
 
 // Main App Component
 export default function App() {
+  // Load saved data from localStorage or use defaults
+  const loadSavedData = () => {
+    try {
+      const savedData = localStorage.getItem('pdf-slides-data');
+      if (savedData) {
+        const parsed = JSON.parse(savedData);
+        return {
+          pages: parsed.pages || [{
+            title: "Welcome!",
+            content: "Create beautiful, slide-deck style PDFs for your social media posts.",
+            backgroundColor: "#e0f2fe",
+            image: null,
+            template: "simple",
+          }],
+          authorName: parsed.authorName || "Your Name",
+          font: parsed.font || "helvetica",
+          showPageNumbers: parsed.showPageNumbers !== undefined ? parsed.showPageNumbers : true,
+        };
+      }
+    } catch (error) {
+      console.log('Error loading saved data:', error);
+    }
+    
+    // Return defaults if no saved data or error
+    return {
+      pages: [{
+        title: "Welcome!",
+        content: "Create beautiful, slide-deck style PDFs for your social media posts.",
+        backgroundColor: "#e0f2fe",
+        image: null,
+        template: "simple",
+      }],
+      authorName: "Your Name",
+      font: "helvetica",
+      showPageNumbers: true,
+    };
+  };
+
+  const savedData = loadSavedData();
+  
   // State hooks to store user input
-  const [pages, setPages] = useState([
-    {
-      title: "Welcome!",
-      content:
-        "Create beautiful, slide-deck style PDFs for your social media posts.",
-      backgroundColor: "#e0f2fe",
-      image: null,
-      template: "simple",
-    },
-  ]);
-  const [authorName, setAuthorName] = useState("Your Name");
-  const [font, setFont] = useState("helvetica");
-  const [showPageNumbers, setShowPageNumbers] = useState(true);
+  const [pages, setPages] = useState(savedData.pages);
+  const [authorName, setAuthorName] = useState(savedData.authorName);
+  const [font, setFont] = useState(savedData.font);
+  const [showPageNumbers, setShowPageNumbers] = useState(savedData.showPageNumbers);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState(false);
   const { isDarkMode, toggleDarkMode } = useDarkMode();
+
+  // Auto-save to localStorage whenever data changes
+  useEffect(() => {
+    const dataToSave = {
+      pages,
+      authorName,
+      font,
+      showPageNumbers,
+    };
+    
+    try {
+      localStorage.setItem('pdf-slides-data', JSON.stringify(dataToSave));
+    } catch (error) {
+      console.log('Error saving data:', error);
+    }
+  }, [pages, authorName, font, showPageNumbers]);
+
+  // Clear saved data from localStorage
+  const clearSavedData = () => {
+    try {
+      localStorage.removeItem('pdf-slides-data');
+    } catch (error) {
+      console.log('Error clearing saved data:', error);
+    }
+  };
 
 
   const handleAddPage = () => {
@@ -39,7 +95,21 @@ export default function App() {
   };
 
   const handleRemovePage = (indexToRemove) => {
-    setPages(pages.filter((_, index) => index !== indexToRemove));
+    if (indexToRemove === 0) {
+      // For the first slide, clear its content instead of removing it
+      const updatedPages = [...pages];
+      updatedPages[0] = {
+        title: "",
+        content: "",
+        backgroundColor: "#e0f2fe",
+        image: null,
+        template: "simple",
+      };
+      setPages(updatedPages);
+    } else {
+      // For other slides, remove them completely
+      setPages(pages.filter((_, index) => index !== indexToRemove));
+    }
   };
 
   const handlePageContentChange = (index, newContent) => {
@@ -132,6 +202,9 @@ export default function App() {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+      
+      // Clear saved data after successful download
+      clearSavedData();
     } catch (error) {
       console.error('Error generating PDF:', error);
     } finally {
@@ -204,7 +277,7 @@ export default function App() {
                   onImageRemove={handlePageImageRemove}
                   onTemplateChange={handlePageTemplateChange}
                   onRemove={handleRemovePage}
-                  canBeRemoved={pages.length > 1}
+                  canBeRemoved={true}
                   isDarkMode={isDarkMode}
                 />
               ))}

@@ -241,8 +241,9 @@ const PDFSlide = ({ page, index, totalPages, authorName, showPageNumbers, styles
   );
 };
 
-const PDFDocument = ({ pages, authorName, backgroundColor, font, showPageNumbers, textColor, secondaryTextColor }) => {
-  const styles = createStyles(backgroundColor, textColor, secondaryTextColor, font);
+const PDFDocument = ({ pages, authorName, font, showPageNumbers, backgroundColor = "#e0f2fe", textColor = "#1f2937", secondaryTextColor = "#64748b" }) => {
+  // Create default styles - these are only used as fallbacks since each slide calculates its own colors
+  const defaultStyles = createStyles(backgroundColor, textColor, secondaryTextColor, font);
 
   return (
     <Document>
@@ -254,7 +255,7 @@ const PDFDocument = ({ pages, authorName, backgroundColor, font, showPageNumbers
           totalPages={pages.length}
           authorName={authorName}
           showPageNumbers={showPageNumbers}
-          styles={styles}
+          styles={defaultStyles}
           font={font}
         />
       ))}

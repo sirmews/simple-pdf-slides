@@ -1,4 +1,10 @@
-export function hexToRgb(hex) {
+export interface RGB {
+  r: number;
+  g: number;
+  b: number;
+}
+
+export function hexToRgb(hex: string): RGB | null {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
   return result
     ? {
@@ -9,7 +15,7 @@ export function hexToRgb(hex) {
     : null;
 }
 
-export function getLuminance(r, g, b) {
+export function getLuminance(r: number, g: number, b: number): number {
   const [rs, gs, bs] = [r, g, b].map((c) => {
     c = c / 255;
     return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
@@ -17,7 +23,7 @@ export function getLuminance(r, g, b) {
   return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
 }
 
-export function getContrastTextColor(backgroundColor) {
+export function getContrastTextColor(backgroundColor: string): string {
   const rgb = hexToRgb(backgroundColor);
   if (!rgb) return "#1e293b";
 

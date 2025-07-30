@@ -1,8 +1,27 @@
 import { XCircle, Palette, Upload, Image as ImageIcon, Layout } from "lucide-react";
 import TemplateSelector from "./TemplateSelector";
+import { SlideTemplate } from "@/types/slide";
 
 const MAX_CHARS_PER_PAGE = 250;
 const MAX_CHARS_TITLE = 50;
+
+interface PageInputProps {
+  index: number;
+  title: string;
+  content: string;
+  backgroundColor: string;
+  image: string | null;
+  template: SlideTemplate;
+  onContentChange: (index: number, content: string) => void;
+  onTitleChange: (index: number, title: string) => void;
+  onBackgroundColorChange: (index: number, color: string) => void;
+  onImageChange: (index: number, file: File) => void;
+  onImageRemove: (index: number) => void;
+  onTemplateChange: (index: number, template: SlideTemplate) => void;
+  onRemove: (index: number) => void;
+  canBeRemoved: boolean;
+  isDarkMode: boolean;
+}
 
 export default function PageInput({
   index,
@@ -20,16 +39,16 @@ export default function PageInput({
   onRemove,
   canBeRemoved,
   isDarkMode,
-}) {
+}: PageInputProps) {
   const charsLeft = MAX_CHARS_PER_PAGE - content.length;
 
-  const handleTextChange = (e) => {
+  const handleTextChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     // Enforce character limit (emojis now supported!)
     const newText = e.target.value.slice(0, MAX_CHARS_PER_PAGE);
     onContentChange(index, newText);
   };
 
-  const handleTitleChange = (e) => {
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Enforce character limit (emojis now supported!)
     const newTitle = e.target.value.slice(0, MAX_CHARS_TITLE);
     onTitleChange(index, newTitle);

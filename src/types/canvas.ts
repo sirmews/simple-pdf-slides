@@ -6,7 +6,7 @@ export interface CanvasState {
   canvasScale: number;
 }
 
-export type ViewMode = 'form' | 'canvas';
+export type ViewMode = 'form' | 'grid';
 
 export type EditableElement = 'title' | 'content';
 

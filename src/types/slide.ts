@@ -4,6 +4,8 @@ export interface SlideData {
   backgroundColor: string;
   image: string | null;
   template: SlideTemplate;
+  // Grid-based editing support
+  useGridEditor?: boolean;
 }
 
 export type SlideTemplate = 'simple' | 'split';

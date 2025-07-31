@@ -26,6 +26,7 @@ export default function App() {
             image: null,
             template: "simple" as const,
           }],
+          gridSlides: parsed.gridSlides || [],
           authorName: parsed.authorName || "Your Name",
           font: parsed.font || "helvetica" as FontFamily,
           showPageNumbers: parsed.showPageNumbers !== undefined ? parsed.showPageNumbers : true,
@@ -45,6 +46,7 @@ export default function App() {
         image: null,
         template: "simple" as const,
       }] as SlideData[],
+      gridSlides: [],
       authorName: "Your Name",
       font: "helvetica" as FontFamily,
       showPageNumbers: true,
@@ -61,13 +63,14 @@ export default function App() {
   const [showPageNumbers, setShowPageNumbers] = useState<boolean>(savedData.showPageNumbers);
   const [viewMode, setViewMode] = useState<ViewMode>(savedData.viewMode);
   const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
-  const [gridSlides, setGridSlides] = useState<GridSlideData[]>([]);
+  const [gridSlides, setGridSlides] = useState<GridSlideData[]>(savedData.gridSlides);
   const { isDarkMode, toggleDarkMode } = useDarkMode();
 
   // Auto-save to localStorage whenever data changes
   useEffect(() => {
     const dataToSave = {
       pages,
+      gridSlides,
       authorName,
       font,
       showPageNumbers,
@@ -79,7 +82,17 @@ export default function App() {
     } catch (error) {
       console.log('Error saving data:', error);
     }
-  }, [pages, authorName, font, showPageNumbers, viewMode]);
+  }, [pages, gridSlides, authorName, font, showPageNumbers, viewMode]);
+
+  // Initialize grid slides when switching to grid mode
+  useEffect(() => {
+    if (viewMode === 'grid' && gridSlides.length === 0 && pages.length > 0) {
+      import('./utils/gridUtils').then(({ convertSlideToGridSlide }) => {
+        const initialGridSlides = pages.map(slide => convertSlideToGridSlide(slide));
+        setGridSlides(initialGridSlides);
+      });
+    }
+  }, [viewMode, pages, gridSlides.length]);
 
   // Clear saved data from localStorage
   const clearSavedData = () => {
@@ -92,7 +105,16 @@ export default function App() {
 
 
   const handleAddPage = () => {
-    setPages([...pages, { title: "", content: "", backgroundColor: "#e0f2fe", image: null, template: "simple" as const }]);
+    const newSlide = { title: "", content: "", backgroundColor: "#e0f2fe", image: null, template: "simple" as const };
+    setPages([...pages, newSlide]);
+    
+    // If in grid mode, also add to grid slides
+    if (viewMode === 'grid') {
+      import('./utils/gridUtils').then(({ convertSlideToGridSlide }) => {
+        const newGridSlide = convertSlideToGridSlide(newSlide);
+        setGridSlides([...gridSlides, newGridSlide]);
+      });
+    }
   };
 
   const handleRemovePage = (indexToRemove: number) => {
@@ -199,9 +221,17 @@ export default function App() {
     setIsGeneratingPdf(true);
     
     try {
+      // If we're in grid mode, convert grid slides to regular slides for PDF generation
+      let finalPages = pages;
+      if (viewMode === 'grid' && gridSlides.length > 0) {
+        const { convertGridSlideToSlide } = await import('./utils/gridUtils');
+        finalPages = gridSlides.map(gridSlide => convertGridSlideToSlide(gridSlide));
+        // Successfully using grid slides for PDF generation
+      }
+      
       const blob = await pdf(
         <PDFDocument
-          pages={pages}
+          pages={finalPages}
           authorName={authorName}
           font={font}
           showPageNumbers={showPageNumbers}

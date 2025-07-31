@@ -83,25 +83,46 @@ export function convertSlideToGridSlide(slide: SlideData): GridSlideData {
 }
 
 export function convertGridSlideToSlide(gridSlide: GridSlideData): SlideData {
-  // Find title element (largest text element or first text element)
-  const titleElement = gridSlide.elements
-    .filter(el => el.type === 'text')
-    .sort((a, b) => b.style.fontSize - a.style.fontSize)[0];
 
-  // Find content element (second largest text element or remaining text)
-  const contentElement = gridSlide.elements
-    .filter(el => el.type === 'text' && el.id !== titleElement?.id)
-    .sort((a, b) => b.style.fontSize - a.style.fontSize)[0];
+  // Get all text and shape elements (shapes can contain text content)
+  const contentElements = gridSlide.elements.filter(el => el.type === 'text' || el.type === 'shape');
+  
+  // If we have content elements, combine them all
+  let title = '';
+  let content = '';
+  
+  if (contentElements.length > 0) {
+    // Sort by position (top to bottom, left to right) to maintain reading order
+    const sortedElements = contentElements.sort((a, b) => {
+      if (a.position.row !== b.position.row) {
+        return a.position.row - b.position.row;
+      }
+      return a.position.col - b.position.col;
+    });
+    
+    // Use first element as title if it looks like a title (bold or larger font)
+    const firstElement = sortedElements[0];
+    const isTitle = firstElement.style?.fontWeight === 'bold' || 
+                   (firstElement.style?.fontSize && firstElement.style.fontSize > 20);
+    
+    if (isTitle && sortedElements.length > 1) {
+      title = firstElement.content;
+      content = sortedElements.slice(1).map(el => el.content).join('\n\n');
+    } else {
+      // If no clear title, put everything in content
+      content = sortedElements.map(el => el.content).join('\n\n');
+    }
+  }
 
   // Find image element
   const imageElement = gridSlide.elements.find(el => el.type === 'image');
 
   return {
-    title: titleElement?.content || '',
-    content: contentElement?.content || '',
+    title,
+    content,
     backgroundColor: gridSlide.backgroundColor,
     image: imageElement?.content || null,
-    template: 'simple', // Default template
+    template: 'simple' as const,
     useGridEditor: true
   };
 }

@@ -34,6 +34,8 @@ export default function GridElementComponent({
   onMove
 }: GridElementProps) {
   const [isDragging, setIsDragging] = useState(false);
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeDirection, setResizeDirection] = useState<'se' | 'e' | 's' | null>(null);
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 });
   const [editValue, setEditValue] = useState(element.content);
   const elementRef = useRef<HTMLDivElement>(null);
@@ -51,8 +53,25 @@ export default function GridElementComponent({
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.target === e.currentTarget || (e.target as HTMLElement).classList.contains('drag-handle')) {
+    const target = e.target as HTMLElement;
+    
+    // Check if the click is on a resize handle (including parent elements)
+    const resizeHandle = target.closest('.resize-handle') as HTMLElement;
+    if (resizeHandle) {
       e.preventDefault();
+      e.stopPropagation();
+      setIsResizing(true);
+      setResizeDirection(resizeHandle.dataset.direction as 'se' | 'e' | 's');
+      setDragStart({ x: e.clientX, y: e.clientY });
+      onSelect(element.id);
+      return;
+    }
+    
+    // Check if the click is on the drag handle or the element itself
+    const dragHandle = target.closest('.drag-handle');
+    if (dragHandle || e.target === e.currentTarget) {
+      e.preventDefault();
+      e.stopPropagation();
       setIsDragging(true);
       setDragStart({ x: e.clientX, y: e.clientY });
       onSelect(element.id);
@@ -60,33 +79,81 @@ export default function GridElementComponent({
   };
 
   const handleMouseMove = (e: MouseEvent) => {
-    if (!isDragging) return;
+    if (!isDragging && !isResizing) return;
 
-    const deltaX = (e.clientX - dragStart.x) / scale;
-    const deltaY = (e.clientY - dragStart.y) / scale;
+    if (isDragging) {
+      const deltaX = (e.clientX - dragStart.x) / scale;
+      const deltaY = (e.clientY - dragStart.y) / scale;
 
-    const newCol = Math.round((elementStyle.left + deltaX) / cellWidth);
-    const newRow = Math.round((elementStyle.top + deltaY) / cellHeight);
+      // Calculate new position based on current grid position plus delta
+      const currentPixelX = element.position.col * cellWidth;
+      const currentPixelY = element.position.row * cellHeight;
+      
+      const newPixelX = currentPixelX + deltaX;
+      const newPixelY = currentPixelY + deltaY;
 
-    // Ensure element stays within bounds
-    const clampedCol = Math.max(0, Math.min(newCol, gridConfig.cols - element.position.colSpan));
-    const clampedRow = Math.max(0, Math.min(newRow, gridConfig.rows - element.position.rowSpan));
+      const newCol = Math.round(newPixelX / cellWidth);
+      const newRow = Math.round(newPixelY / cellHeight);
 
-    if (clampedCol !== element.position.col || clampedRow !== element.position.row) {
-      onMove(element.id, {
-        ...element.position,
-        col: clampedCol,
-        row: clampedRow
-      });
+      // Ensure element stays within bounds
+      const clampedCol = Math.max(0, Math.min(newCol, gridConfig.cols - element.position.colSpan));
+      const clampedRow = Math.max(0, Math.min(newRow, gridConfig.rows - element.position.rowSpan));
+
+      if (clampedCol !== element.position.col || clampedRow !== element.position.row) {
+        onMove(element.id, {
+          ...element.position,
+          col: clampedCol,
+          row: clampedRow
+        });
+        // Update drag start to prevent accumulating offsets
+        setDragStart({ x: e.clientX, y: e.clientY });
+      }
+    } else if (isResizing && resizeDirection) {
+      const deltaX = (e.clientX - dragStart.x) / scale;
+      const deltaY = (e.clientY - dragStart.y) / scale;
+
+      const deltaCol = Math.round(deltaX / cellWidth);
+      const deltaRow = Math.round(deltaY / cellHeight);
+
+      let newColSpan = element.position.colSpan;
+      let newRowSpan = element.position.rowSpan;
+
+      if (resizeDirection === 'e' || resizeDirection === 'se') {
+        newColSpan = Math.max(1, Math.min(
+          element.position.colSpan + deltaCol,
+          gridConfig.cols - element.position.col
+        ));
+      }
+
+      if (resizeDirection === 's' || resizeDirection === 'se') {
+        newRowSpan = Math.max(1, Math.min(
+          element.position.rowSpan + deltaRow,
+          gridConfig.rows - element.position.row
+        ));
+      }
+
+      if (newColSpan !== element.position.colSpan || newRowSpan !== element.position.rowSpan) {
+        onUpdate(element.id, {
+          position: {
+            ...element.position,
+            colSpan: newColSpan,
+            rowSpan: newRowSpan
+          }
+        });
+        // Update drag start to prevent accumulating offsets
+        setDragStart({ x: e.clientX, y: e.clientY });
+      }
     }
   };
 
   const handleMouseUp = () => {
     setIsDragging(false);
+    setIsResizing(false);
+    setResizeDirection(null);
   };
 
   React.useEffect(() => {
-    if (isDragging) {
+    if (isDragging || isResizing) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
       return () => {
@@ -94,7 +161,7 @@ export default function GridElementComponent({
         document.removeEventListener('mouseup', handleMouseUp);
       };
     }
-  }, [isDragging, dragStart, elementStyle.left, elementStyle.top]);
+  }, [isDragging, isResizing, dragStart, elementStyle.left, elementStyle.top]);
 
   const handleContentSave = () => {
     onUpdate(element.id, { content: editValue });
@@ -119,9 +186,11 @@ export default function GridElementComponent({
   return (
     <div
       ref={elementRef}
-      className={`absolute cursor-pointer transition-all duration-200 ${
+      className={`absolute transition-all duration-200 ${
         isSelected ? 'ring-2 ring-blue-500' : ''
-      } ${isDragging ? 'opacity-70' : ''}`}
+      } ${isDragging || isResizing ? 'opacity-70' : ''} ${
+        !isEditing ? 'cursor-pointer' : ''
+      }`}
       style={{
         ...elementStyle,
         backgroundColor: element.style.backgroundColor,
@@ -139,8 +208,10 @@ export default function GridElementComponent({
     >
       {/* Drag Handle */}
       {isSelected && !isEditing && (
-        <div className="drag-handle absolute -top-2 -left-2 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center cursor-move opacity-80 hover:opacity-100">
-          <Move className="w-3 h-3 text-white" />
+        <div 
+          className="drag-handle absolute -top-3 -left-3 w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center cursor-move opacity-90 hover:opacity-100 shadow-lg border-2 border-white z-10"
+        >
+          <Move className="w-4 h-4 text-white" />
         </div>
       )}
 
@@ -204,6 +275,28 @@ export default function GridElementComponent({
             <Trash2 className="w-3 h-3 text-white" />
           </button>
         </div>
+      )}
+
+      {/* Resize Handles */}
+      {isSelected && !isEditing && (
+        <>
+          {/* Bottom-right corner resize handle */}
+          <div
+            className="resize-handle absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500 cursor-se-resize opacity-60 hover:opacity-100"
+            data-direction="se"
+            style={{ clipPath: 'polygon(100% 0%, 0% 100%, 100% 100%)' }}
+          />
+          {/* Right edge resize handle */}
+          <div
+            className="resize-handle absolute top-1/2 -right-1 w-2 h-6 bg-blue-500 cursor-e-resize opacity-60 hover:opacity-100 transform -translate-y-1/2 rounded-r"
+            data-direction="e"
+          />
+          {/* Bottom edge resize handle */}
+          <div
+            className="resize-handle absolute -bottom-1 left-1/2 w-6 h-2 bg-blue-500 cursor-s-resize opacity-60 hover:opacity-100 transform -translate-x-1/2 rounded-b"
+            data-direction="s"
+          />
+        </>
       )}
     </div>
   );

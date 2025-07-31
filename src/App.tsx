@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { pdf } from '@react-pdf/renderer';
 import PDFDocument from './PDFDocument';
-import AppHeader from './components/AppHeader';
+import Layout from './components/Layout';
 import FormView from './components/FormView';
 import GridView from './components/GridView';
 import { useDarkMode } from './hooks/useDarkMode';
@@ -229,16 +229,12 @@ export default function App() {
 
   // Render the appropriate view
   return (
-    <div className={`${isDarkMode ? "dark bg-gray-900" : "bg-slate-100"} min-h-screen font-sans transition-colors duration-200`}>
-      {/* Unified Header */}
-      <AppHeader
-        viewMode={viewMode}
-        isDarkMode={isDarkMode}
-        onViewModeChange={setViewMode}
-        onToggleDarkMode={toggleDarkMode}
-      />
-
-      {/* Main Content */}
+    <Layout
+      isDarkMode={isDarkMode}
+      viewMode={viewMode}
+      onViewModeChange={setViewMode}
+      onToggleDarkMode={toggleDarkMode}
+    >
       {viewMode === 'form' ? (
         <FormView
           slides={pages}
@@ -268,6 +264,6 @@ export default function App() {
           onSlidesUpdate={setPages}
         />
       )}
-    </div>
+    </Layout>
   );
 }

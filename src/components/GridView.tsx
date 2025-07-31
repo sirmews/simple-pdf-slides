@@ -43,9 +43,9 @@ export default function GridView({
   };
 
   return (
-    <div className="max-w-6xl mx-auto px-6 pb-6">
+    <div className="max-w-7xl mx-auto px-4 pb-6">
       {/* Grid Slides */}
-      <div className="space-y-8">
+      <div className="space-y-10">
         {currentGridSlides.map((gridSlide, index) => (
           <div key={gridSlide.id} className="flex justify-center">
             <GridSlideEditor
@@ -54,7 +54,7 @@ export default function GridView({
               isSelected={true}
               onSlideClick={() => {}}
               onSlideUpdate={(updatedSlide) => handleGridSlideUpdate(index, updatedSlide)}
-              scale={0.8}
+              scale={1.1}
             />
           </div>
         ))}

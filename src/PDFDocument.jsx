@@ -1,6 +1,7 @@
 import React from 'react';
 import { Document, Page, Text, StyleSheet, Font, Image, View } from '@react-pdf/renderer';
 import { getContrastTextColor } from './utils/colorUtils';
+import { PDFGridElements } from './components/PDFGridElement';
 
 // Register fonts with emoji support
 Font.register({
@@ -85,6 +86,9 @@ const createStyles = (backgroundColor, textColor, secondaryTextColor, font) => S
 });
 
 const PDFSlide = ({ page, index, totalPages, authorName, showPageNumbers, styles, font }) => {
+  // Check if this is a grid-based slide (has gridConfig and elements)
+  const isGridSlide = page.gridConfig && page.elements;
+  
   const hasTitle = page.title && page.title.trim() !== '';
   const hasContent = page.content && page.content.trim() !== '';
   const template = page.template || 'simple';
@@ -227,9 +231,22 @@ const PDFSlide = ({ page, index, totalPages, authorName, showPageNumbers, styles
     </View>
   );
 
+  const renderGridTemplate = () => (
+    <View style={{ position: 'relative', width: '100%', height: '100%' }}>
+      {/* Render grid elements */}
+      <PDFGridElements 
+        elements={page.elements} 
+        gridConfig={page.gridConfig}
+      />
+    </View>
+  );
+
   return (
     <Page size={[595, 595]} style={slidePageStyle}>
-      {template === 'split' ? renderSplitTemplate() : renderSimpleTemplate()}
+      {isGridSlide 
+        ? renderGridTemplate() 
+        : (template === 'split' ? renderSplitTemplate() : renderSimpleTemplate())
+      }
       
       {showPageNumbers && (
         <Text style={slidePageNumberStyle}>

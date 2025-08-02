@@ -6,6 +6,9 @@ export interface SlideData {
   template: SlideTemplate;
   // Grid-based editing support
   useGridEditor?: boolean;
+  // Grid data (when using grid editor)
+  gridConfig?: import('./grid').GridConfig;
+  elements?: import('./grid').GridElement[];
 }
 
 export type SlideTemplate = 'simple' | 'split';

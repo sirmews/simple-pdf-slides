@@ -214,9 +214,9 @@ export default function App() {
 
   return (
     <div
-      className={`${isDarkMode ? "dark bg-gray-900" : "bg-slate-100"} flex items-center justify-center min-h-screen font-sans py-10 transition-colors duration-200`}
+      className={`${isDarkMode ? "dark bg-gray-900" : "bg-slate-100"} flex items-center justify-center min-h-screen font-sans sm:py-10 transition-colors duration-200`}
     >
-      <div className="w-full max-w-2xl mx-auto p-4 sm:p-6 md:p-8">
+      <div className="w-full max-w-2xl mx-auto sm:p-6 md:p-8">
         <div
           className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-lg border ${isDarkMode ? "border-gray-700" : "border-gray-200"} transition-colors duration-200`}
         >

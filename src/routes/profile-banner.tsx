@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import PageContainer from "../components/PageContainer";
 import { Upload, Download, Image as ImageIcon } from "lucide-react";
+import { useProfileBanner } from "../hooks/useProfileBanner";
 
 export const Route = createFileRoute("/profile-banner")({
   component: ProfileBanner,
@@ -9,7 +10,7 @@ export const Route = createFileRoute("/profile-banner")({
 
 function ProfileBanner() {
   const { isDarkMode } = Route.useRouteContext();
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  const { selectedImage, selectedBanner, updateSelectedImage, updateSelectedBanner } = useProfileBanner();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -17,7 +18,7 @@ function ProfileBanner() {
     if (file) {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setSelectedImage(e.target?.result as string);
+        updateSelectedImage(e.target?.result as string);
       };
       reader.readAsDataURL(file);
     }
@@ -27,10 +28,8 @@ function ProfileBanner() {
     fileInputRef.current?.click();
   };
 
-  const [selectedBanner, setSelectedBanner] = useState<string | null>(null);
-
   const toggleBanner = (bannerType: string) => {
-    setSelectedBanner(selectedBanner === bannerType ? null : bannerType);
+    updateSelectedBanner(selectedBanner === bannerType ? null : bannerType);
   };
 
   const handleSaveImage = async () => {
@@ -202,156 +201,152 @@ function ProfileBanner() {
           </div>
         </div>
         <div className="card-content">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            {/* Left Column - Image Upload and Preview */}
-            <div className="space-y-4">
-              <div className="flex justify-center">
-                <div
-                  onClick={handleCircleClick}
-                  className="relative w-64 h-64 cursor-pointer"
-                >
-                  <div
-                    className={`w-full h-full rounded-full transition-all duration-200 overflow-hidden ${
-                      selectedImage
-                        ? ""
-                        : isDarkMode
-                          ? "bg-gray-700 border-2 border-dashed border-gray-600 hover:border-gray-500"
-                          : "bg-gray-50 border-2 border-dashed border-slate-300 hover:border-slate-400"
-                    }`}
-                  >
-                    {selectedImage ? (
-                      <div className="relative w-full h-full">
-                        <img
-                          src={selectedImage}
-                          alt="Profile preview"
-                          className="w-full h-full object-cover rounded-full"
-                        />
+          {/* Image Upload and Preview */}
+          <div className="flex justify-center mb-8">
+            <div
+              onClick={handleCircleClick}
+              className="relative w-64 h-64 cursor-pointer"
+            >
+              <div
+                className={`w-full h-full rounded-full transition-all duration-200 overflow-hidden ${
+                  selectedImage
+                    ? ""
+                    : isDarkMode
+                      ? "bg-gray-700 border-2 border-dashed border-gray-600 hover:border-gray-500"
+                      : "bg-gray-50 border-2 border-dashed border-slate-300 hover:border-slate-400"
+                }`}
+              >
+                {selectedImage ? (
+                  <div className="relative w-full h-full">
+                    <img
+                      src={selectedImage}
+                      alt="Profile preview"
+                      className="w-full h-full object-cover rounded-full"
+                    />
 
-                        {/* Banner overlays */}
-                        {selectedBanner === "seeking-clients" && (
-                          <img
-                            src="/assets/seek-clients.png"
-                            alt="Seeking Clients"
-                            className="absolute inset-0 w-full h-full object-cover rounded-full pointer-events-none"
-                          />
-                        )}
+                    {/* Banner overlays */}
+                    {selectedBanner === "seeking-clients" && (
+                      <img
+                        src="/assets/seek-clients.png"
+                        alt="Seeking Clients"
+                        className="absolute inset-0 w-full h-full object-cover rounded-full pointer-events-none"
+                      />
+                    )}
 
-                        {selectedBanner === "button-effect" && (
-                          <div className="absolute inset-0 rounded-full pointer-events-none">
-                            {/* Enhanced button effect with shadow and depth */}
-                            <div
-                              className="absolute inset-0 rounded-full"
-                              style={{
-                                boxShadow:
-                                  "0 8px 20px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.4), inset 0 -2px 4px rgba(0, 0, 0, 0.2)",
-                                background:
-                                  "linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(0,0,0,0.1) 100%)",
-                              }}
-                            ></div>
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="flex flex-col items-center justify-center h-full text-center p-8">
-                        <Upload
-                          className={`w-12 h-12 mb-4 ${isDarkMode ? "text-gray-400" : "text-slate-400"}`}
-                        />
-                        <p
-                          className={`text-sm ${isDarkMode ? "text-gray-400" : "text-slate-500"}`}
-                        >
-                          Click to upload image
-                        </p>
+                    {selectedBanner === "button-effect" && (
+                      <div className="absolute inset-0 rounded-full pointer-events-none">
+                        {/* Enhanced button effect with shadow and depth */}
+                        <div
+                          className="absolute inset-0 rounded-full"
+                          style={{
+                            boxShadow:
+                              "0 8px 20px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.4), inset 0 -2px 4px rgba(0, 0, 0, 0.2)",
+                            background:
+                              "linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(0,0,0,0.1) 100%)",
+                          }}
+                        ></div>
                       </div>
                     )}
                   </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center h-full text-center p-8">
+                    <Upload
+                      className={`w-12 h-12 mb-4 ${isDarkMode ? "text-gray-400" : "text-slate-400"}`}
+                    />
+                    <p
+                      className={`text-sm ${isDarkMode ? "text-gray-400" : "text-slate-500"}`}
+                    >
+                      Click to upload image
+                    </p>
+                  </div>
+                )}
+              </div>
 
-                  <input
-                    ref={fileInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+            </div>
+          </div>
+
+          {/* Banner Options */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-semibold text-primary">
+              Banner Options
+            </h3>
+
+            <button
+              onClick={() => toggleBanner("seeking-clients")}
+              className={`w-full p-4 border-2 rounded-lg transition-all duration-200 flex items-center gap-3 ${
+                selectedBanner === "seeking-clients"
+                  ? "border-blue-500 bg-blue-50"
+                  : isDarkMode
+                    ? "border-gray-600 hover:border-gray-500"
+                    : "border-slate-300 hover:border-slate-400"
+              }`}
+            >
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold">
+                #
+              </div>
+              <div className="text-left">
+                <div
+                  className={`font-semibold ${
+                    selectedBanner === "seeking-clients"
+                      ? "text-blue-700"
+                      : "text-primary"
+                  }`}
+                >
+                  Seeking Clients Banner
+                </div>
+                <div
+                  className={`text-sm ${
+                    selectedBanner === "seeking-clients"
+                      ? "text-blue-600"
+                      : "text-secondary"
+                  }`}
+                >
+                  Add "#SEEKINGCLIENTS" overlay to your profile
                 </div>
               </div>
-            </div>
+            </button>
 
-            {/* Right Column - Banner Options */}
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold text-primary">
-                Banner Options
-              </h3>
-
-              <button
-                onClick={() => toggleBanner("seeking-clients")}
-                className={`w-full p-4 border-2 rounded-lg transition-all duration-200 flex items-center gap-3 ${
-                  selectedBanner === "seeking-clients"
-                    ? "border-blue-500 bg-blue-50"
-                    : isDarkMode
-                      ? "border-gray-600 hover:border-gray-500"
-                      : "border-slate-300 hover:border-slate-400"
-                }`}
-              >
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-orange-400 to-orange-600 flex items-center justify-center text-white font-bold">
-                  #
+            <button
+              onClick={() => toggleBanner("button-effect")}
+              className={`w-full p-4 border-2 rounded-lg transition-all duration-200 flex items-center gap-3 ${
+                selectedBanner === "button-effect"
+                  ? "border-blue-500 bg-blue-50"
+                  : isDarkMode
+                    ? "border-gray-600 hover:border-gray-500"
+                    : "border-slate-300 hover:border-slate-400"
+              }`}
+            >
+              <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white font-bold border-2 border-white shadow-md">
+                ⚪
+              </div>
+              <div className="text-left">
+                <div
+                  className={`font-semibold ${
+                    selectedBanner === "button-effect"
+                      ? "text-blue-700"
+                      : "text-primary"
+                  }`}
+                >
+                  Button Effect
                 </div>
-                <div className="text-left">
-                  <div
-                    className={`font-semibold ${
-                      selectedBanner === "seeking-clients"
-                        ? "text-blue-700"
-                        : "text-primary"
-                    }`}
-                  >
-                    Seeking Clients Banner
-                  </div>
-                  <div
-                    className={`text-sm ${
-                      selectedBanner === "seeking-clients"
-                        ? "text-blue-600"
-                        : "text-secondary"
-                    }`}
-                  >
-                    Add "#SEEKINGCLIENTS" overlay to your profile
-                  </div>
+                <div
+                  className={`text-sm ${
+                    selectedBanner === "button-effect"
+                      ? "text-blue-600"
+                      : "text-secondary"
+                  }`}
+                >
+                  Add professional button-like border and shadow
                 </div>
-              </button>
-
-              <button
-                onClick={() => toggleBanner("button-effect")}
-                className={`w-full p-4 border-2 rounded-lg transition-all duration-200 flex items-center gap-3 ${
-                  selectedBanner === "button-effect"
-                    ? "border-blue-500 bg-blue-50"
-                    : isDarkMode
-                      ? "border-gray-600 hover:border-gray-500"
-                      : "border-slate-300 hover:border-slate-400"
-                }`}
-              >
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white font-bold border-2 border-white shadow-md">
-                  ⚪
-                </div>
-                <div className="text-left">
-                  <div
-                    className={`font-semibold ${
-                      selectedBanner === "button-effect"
-                        ? "text-blue-700"
-                        : "text-primary"
-                    }`}
-                  >
-                    Button Effect
-                  </div>
-                  <div
-                    className={`text-sm ${
-                      selectedBanner === "button-effect"
-                        ? "text-blue-600"
-                        : "text-secondary"
-                    }`}
-                  >
-                    Add professional button-like border and shadow
-                  </div>
-                </div>
-              </button>
-            </div>
+              </div>
+            </button>
           </div>
 
           {/* Save Button */}

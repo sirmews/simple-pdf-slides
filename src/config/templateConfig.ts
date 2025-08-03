@@ -36,7 +36,7 @@ export const TEMPLATE_DEFINITIONS: TemplateDefinition[] = [
       title: true,
       content: true,
       backgroundColor: true,
-      image: false,
+      image: true,
       templateSelector: true,
     },
     category: "basic"

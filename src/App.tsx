@@ -8,7 +8,7 @@ export default function App() {
 
   return (
     <div
-      className={`${isDarkMode ? "dark bg-gray-900" : "bg-slate-100"} min-h-screen font-sans transition-colors duration-200`}
+      className={`${isDarkMode ? "dark bg-gray-900" : "bg-slate-200"} min-h-screen font-sans transition-colors duration-200`}
     >
       <Header isDarkMode={isDarkMode} toggleDarkMode={toggleDarkMode} />
       <MainContent isDarkMode={isDarkMode} />

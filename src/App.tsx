@@ -14,10 +14,26 @@ import {
 } from "lucide-react";
 
 
+// Types
+interface Page {
+  title: string;
+  content: string;
+  backgroundColor: string;
+  image: string | null;
+  template: string;
+}
+
+interface SavedData {
+  pages: Page[];
+  authorName: string;
+  font: string;
+  showPageNumbers: boolean;
+}
+
 // Main App Component
 export default function App() {
   // Load saved data from localStorage or use defaults
-  const loadSavedData = () => {
+  const loadSavedData = (): SavedData => {
     try {
       const savedData = localStorage.getItem('pdf-slides-data');
       if (savedData) {
@@ -94,7 +110,7 @@ export default function App() {
     setPages([...pages, { title: "", content: "", backgroundColor: "#e0f2fe", image: null, template: "simple" }]);
   };
 
-  const handleRemovePage = (indexToRemove) => {
+  const handleRemovePage = (indexToRemove: number) => {
     if (indexToRemove === 0) {
       // For the first slide, clear its content instead of removing it
       const updatedPages = [...pages];
@@ -112,50 +128,50 @@ export default function App() {
     }
   };
 
-  const handlePageContentChange = (index, newContent) => {
+  const handlePageContentChange = (index: number, newContent: string) => {
     const updatedPages = [...pages];
     updatedPages[index].content = newContent;
     setPages(updatedPages);
   };
 
-  const handlePageTitleChange = (index, newTitle) => {
+  const handlePageTitleChange = (index: number, newTitle: string) => {
     const updatedPages = [...pages];
     updatedPages[index].title = newTitle;
     setPages(updatedPages);
   };
 
-  const handlePageBackgroundColorChange = (index, newColor) => {
+  const handlePageBackgroundColorChange = (index: number, newColor: string) => {
     const updatedPages = [...pages];
     updatedPages[index].backgroundColor = newColor;
     setPages(updatedPages);
   };
 
-  const handlePageImageChange = (index, imageFile) => {
+  const handlePageImageChange = (index: number, imageFile: File) => {
     if (imageFile) {
       const reader = new FileReader();
-      reader.onload = (e) => {
+      reader.onload = (e: ProgressEvent<FileReader>) => {
         const updatedPages = [...pages];
-        updatedPages[index].image = e.target.result; // This will be a data URL
+        updatedPages[index].image = e.target?.result as string; // This will be a data URL
         setPages(updatedPages);
       };
       reader.readAsDataURL(imageFile);
     }
   };
 
-  const handlePageImageRemove = (index) => {
+  const handlePageImageRemove = (index: number) => {
     const updatedPages = [...pages];
     updatedPages[index].image = null;
     setPages(updatedPages);
   };
 
-  const handlePageTemplateChange = (index, newTemplate) => {
+  const handlePageTemplateChange = (index: number, newTemplate: string) => {
     const updatedPages = [...pages];
     updatedPages[index].template = newTemplate;
     setPages(updatedPages);
   };
 
 
-  const generateFilename = () => {
+  const generateFilename = (): string => {
     const firstSlide = pages[0];
     if (!firstSlide) return "slidedeck.pdf";
 
@@ -214,52 +230,60 @@ export default function App() {
 
   return (
     <div
-      className={`${isDarkMode ? "dark bg-gray-900" : "bg-slate-100"} flex items-center justify-center min-h-screen font-sans sm:py-10 transition-colors duration-200`}
+      className={`${isDarkMode ? "dark bg-gray-900" : "bg-slate-100"} min-h-screen font-sans transition-colors duration-200`}
     >
-      <div className="w-full max-w-2xl mx-auto sm:p-6 md:p-8">
-        <div
-          className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-lg border ${isDarkMode ? "border-gray-700" : "border-gray-200"} transition-colors duration-200`}
-        >
-          <div
-            className={`p-6 md:p-8 border-b ${isDarkMode ? "border-gray-700" : "border-slate-200"} flex justify-between items-center`}
+      {/* Section 1: Transparent Header */}
+      <header className="fixed top-0 left-0 right-0 z-50 bg-transparent">
+        <div className="flex justify-end p-4">
+          <button
+            onClick={toggleDarkMode}
+            className={`p-2 rounded-lg transition-colors duration-200 backdrop-blur-sm ${
+              isDarkMode
+                ? "bg-gray-800/80 hover:bg-gray-700/80 text-yellow-400 border border-gray-600/50"
+                : "bg-white/80 hover:bg-slate-100/80 text-slate-600 border border-slate-200/50"
+            }`}
+            title={
+              isDarkMode ? "Switch to light mode" : "Switch to dark mode"
+            }
           >
-            <div>
-              <h1
-                className={`text-2xl sm:text-3xl font-bold ${isDarkMode ? "text-white" : "text-slate-800"}`}
-              >
-                Kinda professional carousels
-              </h1>
-              <p
-                className={`${isDarkMode ? "text-gray-400" : "text-slate-500"} mt-2`}
-              >
-                Y'know those awful carousels we're forced to navigate in LinkedIn?
-                <br />
-                Be the problem, not the solution. Here's a solution
-              </p>
-              <p
-                className={`${isDarkMode ? "text-gray-400" : "text-slate-500"} mt-2`}
-              >
-                Now with emoji support! Express yourself professionally 🚀
-              </p>
-            </div>
-            <button
-              onClick={toggleDarkMode}
-              className={`p-2 rounded-lg transition-colors duration-200 ${
-                isDarkMode
-                  ? "bg-gray-700 hover:bg-gray-600 text-yellow-400"
-                  : "bg-slate-100 hover:bg-slate-200 text-slate-600"
-              }`}
-              title={
-                isDarkMode ? "Switch to light mode" : "Switch to dark mode"
-              }
+            {isDarkMode ? (
+              <Sun className="w-5 h-5" />
+            ) : (
+              <Moon className="w-5 h-5" />
+            )}
+          </button>
+        </div>
+      </header>
+
+      {/* Section 2: Main Content (Centered) */}
+      <main className="flex items-center justify-center min-h-screen pt-16 pb-20">
+        <div className="w-full max-w-2xl mx-auto px-6 md:px-8">
+          <div
+            className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-lg border ${isDarkMode ? "border-gray-700" : "border-gray-200"} transition-colors duration-200`}
+          >
+            <div
+              className={`p-6 md:p-8 border-b ${isDarkMode ? "border-gray-700" : "border-slate-200"}`}
             >
-              {isDarkMode ? (
-                <Sun className="w-5 h-5" />
-              ) : (
-                <Moon className="w-5 h-5" />
-              )}
-            </button>
-          </div>
+              <div>
+                <h1
+                  className={`text-2xl sm:text-3xl font-bold ${isDarkMode ? "text-white" : "text-slate-800"}`}
+                >
+                  Kinda professional carousels
+                </h1>
+                <p
+                  className={`${isDarkMode ? "text-gray-400" : "text-slate-500"} mt-2`}
+                >
+                  Y'know those awful carousels we're forced to navigate in LinkedIn?
+                  <br />
+                  Be the problem, not the solution. Here's a solution
+                </p>
+                <p
+                  className={`${isDarkMode ? "text-gray-400" : "text-slate-500"} mt-2`}
+                >
+                  Now with emoji support! Express yourself professionally 🚀
+                </p>
+              </div>
+            </div>
 
           <div className="p-6 md:p-8 space-y-6">
             <div className="space-y-4">
@@ -386,10 +410,14 @@ export default function App() {
               )}
             </button>
           </div>
+          </div>
         </div>
+      </main>
 
+      {/* Section 3: Footer (Centered) */}
+      <footer className="flex flex-col items-center justify-center py-8 px-6">
         {/* Ko-fi Support Button */}
-        <div className="flex justify-center mt-6">
+        <div className="flex justify-center mb-4">
           <a href='https://ko-fi.com/A0A01HT0RG' target='_blank' rel='noopener noreferrer'>
             <img 
               height='36' 
@@ -400,12 +428,12 @@ export default function App() {
           </a>
         </div>
 
-        <footer
-          className={`text-center mt-4 text-sm ${isDarkMode ? "text-gray-400" : "text-slate-500"}`}
+        <div
+          className={`text-center text-sm ${isDarkMode ? "text-gray-400" : "text-slate-500"}`}
         >
           <p>&copy; 2025 PDF Slide Generator. Built with vibes by Nav.</p>
-        </footer>
-      </div>
+        </div>
+      </footer>
     </div>
   );
 }

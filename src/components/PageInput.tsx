@@ -1,8 +1,27 @@
 import { XCircle, Palette, Upload, Image as ImageIcon, Layout } from "lucide-react";
 import TemplateSelector from "./TemplateSelector";
+import { ChangeEvent } from "react";
 
 const MAX_CHARS_PER_PAGE = 250;
 const MAX_CHARS_TITLE = 50;
+
+interface PageInputProps {
+  index: number;
+  title: string;
+  content: string;
+  backgroundColor: string;
+  image: string | null;
+  template: string;
+  onContentChange: (index: number, content: string) => void;
+  onTitleChange: (index: number, title: string) => void;
+  onBackgroundColorChange: (index: number, color: string) => void;
+  onImageChange: (index: number, file: File) => void;
+  onImageRemove: (index: number) => void;
+  onTemplateChange: (index: number, template: string) => void;
+  onRemove: (index: number) => void;
+  canBeRemoved: boolean;
+  isDarkMode: boolean;
+}
 
 export default function PageInput({
   index,
@@ -20,16 +39,16 @@ export default function PageInput({
   onRemove,
   canBeRemoved,
   isDarkMode,
-}) {
+}: PageInputProps) {
   const charsLeft = MAX_CHARS_PER_PAGE - content.length;
 
-  const handleTextChange = (e) => {
+  const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
     // Enforce character limit (emojis now supported!)
     const newText = e.target.value.slice(0, MAX_CHARS_PER_PAGE);
     onContentChange(index, newText);
   };
 
-  const handleTitleChange = (e) => {
+  const handleTitleChange = (e: ChangeEvent<HTMLInputElement>) => {
     // Enforce character limit (emojis now supported!)
     const newTitle = e.target.value.slice(0, MAX_CHARS_TITLE);
     onTitleChange(index, newTitle);
@@ -116,7 +135,7 @@ export default function PageInput({
           <div
             className={`absolute top-1/2 right-3 transform -translate-y-1/2 w-6 h-6 rounded-md border ${isDarkMode ? "border-gray-600" : "border-slate-300"} cursor-pointer`}
             style={{ backgroundColor: backgroundColor }}
-            onClick={() => document.getElementById(`color-picker-${index}`).click()}
+            onClick={() => document.getElementById(`color-picker-${index}`)?.click()}
             title="Click to open color picker"
           ></div>
         </div>
@@ -150,8 +169,8 @@ export default function PageInput({
             <input
               type="file"
               accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files[0];
+              onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                const file = e.target.files?.[0];
                 if (file) onImageChange(index, file);
               }}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"

@@ -1,6 +1,35 @@
 import React from 'react';
-import { Document, Page, Text, StyleSheet, Font, Image, View } from '@react-pdf/renderer';
+import { Document, Page, Text, StyleSheet, Font, Image, View, Style } from '@react-pdf/renderer';
 import { getContrastTextColor } from './utils/colorUtils';
+
+// Types
+interface PageData {
+  title: string;
+  content: string;
+  backgroundColor: string;
+  image: string | null;
+  template: string;
+}
+
+interface PDFSlideProps {
+  page: PageData;
+  index: number;
+  totalPages: number;
+  authorName: string;
+  showPageNumbers: boolean;
+  styles: any;
+  font: string;
+}
+
+interface PDFDocumentProps {
+  pages: PageData[];
+  authorName: string;
+  backgroundColor?: string;
+  font: string;
+  showPageNumbers: boolean;
+  textColor?: string;
+  secondaryTextColor?: string;
+}
 
 // Register fonts with emoji support
 Font.register({
@@ -33,7 +62,7 @@ Font.registerEmojiSource({
   url: 'https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/',
 });
 
-const createStyles = (backgroundColor, textColor, secondaryTextColor, font) => StyleSheet.create({
+const createStyles = (backgroundColor: string, textColor: string, secondaryTextColor: string, font: string) => StyleSheet.create({
   page: {
     backgroundColor: backgroundColor,
     padding: 40,
@@ -84,7 +113,7 @@ const createStyles = (backgroundColor, textColor, secondaryTextColor, font) => S
   },
 });
 
-const PDFSlide = ({ page, index, totalPages, authorName, showPageNumbers, styles, font }) => {
+const PDFSlide: React.FC<PDFSlideProps> = ({ page, index, totalPages, authorName, showPageNumbers, styles, font }) => {
   const hasTitle = page.title && page.title.trim() !== '';
   const hasContent = page.content && page.content.trim() !== '';
   const template = page.template || 'simple';
@@ -241,7 +270,7 @@ const PDFSlide = ({ page, index, totalPages, authorName, showPageNumbers, styles
   );
 };
 
-const PDFDocument = ({ pages, authorName, backgroundColor, font, showPageNumbers, textColor, secondaryTextColor }) => {
+const PDFDocument: React.FC<PDFDocumentProps> = ({ pages, authorName, backgroundColor = '#ffffff', font, showPageNumbers, textColor = '#000000', secondaryTextColor = '#666666' }) => {
   const styles = createStyles(backgroundColor, textColor, secondaryTextColor, font);
 
   return (

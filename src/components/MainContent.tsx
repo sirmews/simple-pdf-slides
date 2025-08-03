@@ -50,8 +50,10 @@ export default function MainContent({ isDarkMode }: MainContentProps) {
 
   return (
     <main className="flex items-center justify-center min-h-screen pt-16 pb-20">
-      <div className="w-full max-w-2xl mx-auto px-6 md:px-8">
+      <div className="w-full max-w-2xl mx-auto md:px-8">
         <div
+          id="pdf-slides-main-card"
+          data-component="PDFSlidesMainCard"
           className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-lg border ${isDarkMode ? "border-gray-700" : "border-gray-200"} transition-colors duration-200`}
         >
           <div
@@ -84,7 +86,7 @@ export default function MainContent({ isDarkMode }: MainContentProps) {
             </div>
           </div>
 
-          <div className="p-6 md:p-8 space-y-6">
+          <div className="p-4 md:p-8 space-y-6">
             <div className="space-y-4">
               {pages.map((page, index) => (
                 <PageInput

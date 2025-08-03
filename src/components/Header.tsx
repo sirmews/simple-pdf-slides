@@ -7,8 +7,34 @@ interface HeaderProps {
 
 export default function Header({ isDarkMode, toggleDarkMode }: HeaderProps) {
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-transparent">
-      <div className="flex justify-end p-4">
+    <header className="bg-transparent">
+      <div className="flex justify-between items-center p-4">
+        <nav className="flex items-center space-x-6">
+          <a
+            href="/"
+            className={`text-sm font-medium transition-colors duration-200 hover:opacity-80 ${
+              isDarkMode ? "text-white" : "text-slate-900"
+            }`}
+          >
+            Simple PDF Slides
+          </a>
+          <a
+            href="#"
+            className={`text-sm transition-colors duration-200 hover:opacity-80 ${
+              isDarkMode ? "text-gray-300" : "text-slate-600"
+            }`}
+          >
+            Resources
+          </a>
+          <a
+            href="#"
+            className={`text-sm transition-colors duration-200 hover:opacity-80 ${
+              isDarkMode ? "text-gray-300" : "text-slate-600"
+            }`}
+          >
+            Help
+          </a>
+        </nav>
         <button
           onClick={toggleDarkMode}
           className={`p-2 rounded-lg transition-colors duration-200 backdrop-blur-sm ${

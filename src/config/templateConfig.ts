@@ -1,4 +1,4 @@
-import { LucideIcon, Square, Layout, FileText, Image as ImageIcon, Columns, Grid3X3 } from "lucide-react";
+import { LucideIcon, Square, Layout, FileText, Image as ImageIcon, Columns, Grid3X3, AlignLeft } from "lucide-react";
 
 /**
  * Configuration for what inputs each template should show
@@ -29,9 +29,9 @@ export interface TemplateDefinition {
 export const TEMPLATE_DEFINITIONS: TemplateDefinition[] = [
   {
     id: "simple",
-    name: "Simple",
-    description: "Clean single-column layout with title and content",
-    icon: Square,
+    name: "Stacked",
+    description: "Vertical layout with title stacked above content",
+    icon: AlignLeft,
     inputs: {
       title: true,
       content: true,
@@ -69,20 +69,6 @@ export const TEMPLATE_DEFINITIONS: TemplateDefinition[] = [
     },
     category: "media"
   },
-  {
-    id: "content-only",
-    name: "Content Only",
-    description: "Pure content without title or image",
-    icon: FileText,
-    inputs: {
-      title: false,
-      content: true,
-      backgroundColor: true,
-      image: false,
-      templateSelector: true,
-    },
-    category: "text"
-  }
 ];
 
 /**

@@ -127,6 +127,8 @@ const PDFSlide: React.FC<PDFSlideProps> = ({ page, index, totalPages, authorName
   const slidePageStyle = {
     ...styles.page,
     backgroundColor: slideBackgroundColor,
+    // Remove padding for image-only templates to allow full-page coverage
+    padding: template === 'image-only' ? 0 : 40,
   };
   
   const slideTitleStyle = {
@@ -256,9 +258,43 @@ const PDFSlide: React.FC<PDFSlideProps> = ({ page, index, totalPages, authorName
     </View>
   );
 
+  const renderImageOnlyTemplate = () => (
+    <View style={{
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: 595,
+      height: 595,
+    }}>
+      {/* Full-page background image */}
+      {page.image && (
+        <Image 
+          src={page.image} 
+          style={{
+            width: 595,
+            height: 595,
+            objectFit: 'cover',
+          }}
+        />
+      )}
+      
+    </View>
+  );
+
+  const renderTemplateContent = () => {
+    switch (template) {
+      case 'split':
+        return renderSplitTemplate();
+      case 'image-only':
+        return renderImageOnlyTemplate();
+      default:
+        return renderSimpleTemplate();
+    }
+  };
+
   return (
     <Page size={[595, 595]} style={slidePageStyle}>
-      {template === 'split' ? renderSplitTemplate() : renderSimpleTemplate()}
+      {renderTemplateContent()}
       
       {showPageNumbers && (
         <Text style={slidePageNumberStyle}>

@@ -1,9 +1,7 @@
-import { useState } from "react";
-import { pdf } from '@react-pdf/renderer';
-import PDFDocument from '../PDFDocument';
 import PageInput from './PageInput';
 import { useAppData } from '../hooks/useAppData';
-// Remove unused import - Page type is used in useAppData hook
+import { usePageManagement } from '../hooks/usePageManagement';
+import { usePDFGeneration } from '../hooks/usePDFGeneration';
 import {
   ArrowDownToLine,
   Loader2,
@@ -19,109 +17,34 @@ interface MainContentProps {
 export default function MainContent({ isDarkMode }: MainContentProps) {
   // Use our custom hooks for data management
   const {
-    pages,
     authorName,
     font,
     showPageNumbers,
-    updatePages,
     updateAuthorName,
     updateFont,
     updateShowPageNumbers,
     clearAppData,
   } = useAppData();
 
-  const [isGeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false);
+  // Use page management hook
+  const {
+    pages,
+    pageCount,
+    handlePageContentChange,
+    handlePageTitleChange,
+    handlePageBackgroundColorChange,
+    handlePageImageChange,
+    handlePageImageRemove,
+    handlePageTemplateChange,
+    handleAddPage,
+    handleRemovePage,
+  } = usePageManagement();
 
-  const handlePageContentChange = (index: number, content: string) => {
-    const newPages = [...pages];
-    newPages[index].content = content;
-    updatePages(newPages);
-  };
-
-  const handlePageTitleChange = (index: number, title: string) => {
-    const newPages = [...pages];
-    newPages[index].title = title;
-    updatePages(newPages);
-  };
-
-  const handlePageBackgroundColorChange = (index: number, color: string) => {
-    const newPages = [...pages];
-    newPages[index].backgroundColor = color;
-    updatePages(newPages);
-  };
-
-  const handlePageImageChange = (index: number, imageFile: File) => {
-    if (imageFile) {
-      const reader = new FileReader();
-      reader.onload = (e: ProgressEvent<FileReader>) => {
-        const newPages = [...pages];
-        newPages[index].image = e.target?.result as string;
-        updatePages(newPages);
-      };
-      reader.readAsDataURL(imageFile);
-    }
-  };
-
-  const handlePageImageRemove = (index: number) => {
-    const newPages = [...pages];
-    newPages[index].image = null;
-    updatePages(newPages);
-  };
-
-  const handlePageTemplateChange = (index: number, template: string) => {
-    const newPages = [...pages];
-    newPages[index].template = template;
-    updatePages(newPages);
-  };
-
-  const handleAddPage = () => {
-    updatePages([...pages, { title: "", content: "", backgroundColor: "#ffffff", image: null, template: "title-content" }]);
-  };
-
-  const handleRemovePage = (index: number) => {
-    if (pages.length > 1) {
-      const newPages = pages.filter((_, i) => i !== index);
-      updatePages(newPages);
-    }
-  };
-
-  const generateFilename = () => {
-    const now = new Date();
-    const timestamp = now.toISOString().slice(0, 19).replace(/:/g, '-');
-    const authorPart = authorName ? `_${authorName.replace(/[^a-zA-Z0-9]/g, '_')}` : '';
-    return `slides_${timestamp}${authorPart}.pdf`;
-  };
+  // Use PDF generation hook
+  const { isGeneratingPdf, generatePdf } = usePDFGeneration();
 
   const handleGeneratePdf = async () => {
-    setIsGeneratingPdf(true);
-    
-    try {
-      const blob = await pdf(
-        <PDFDocument
-          pages={pages}
-          authorName={authorName}
-          font={font}
-          showPageNumbers={showPageNumbers}
-        />
-      ).toBlob();
-
-      const filename = generateFilename();
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = filename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
-      
-      // Clear saved data after successful download
-      clearAppData();
-    } catch (error) {
-      console.error('Error generating PDF:', error);
-    } finally {
-      setIsGeneratingPdf(false);
-    }
+    await generatePdf(pages, authorName, font, showPageNumbers, clearAppData);
   };
 
   return (
@@ -274,8 +197,8 @@ export default function MainContent({ isDarkMode }: MainContentProps) {
               ) : (
                 <>
                   <ArrowDownToLine className="w-5 h-5 mr-3" />
-                  Generate & Download PDF ({pages.length}{" "}
-                  {pages.length === 1 ? "Slide" : "Slides"})
+                  Generate & Download PDF ({pageCount}{" "}
+                  {pageCount === 1 ? "Slide" : "Slides"})
                 </>
               )}
             </button>

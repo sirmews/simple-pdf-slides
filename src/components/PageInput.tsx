@@ -1,6 +1,7 @@
 import { XCircle, Palette, Upload, Image as ImageIcon, Layout } from "lucide-react";
 import TemplateSelector from "./TemplateSelector";
 import { ChangeEvent } from "react";
+import { shouldShowInput } from "../config/templateConfig";
 
 const MAX_CHARS_PER_PAGE = 250;
 const MAX_CHARS_TITLE = 50;
@@ -40,6 +41,8 @@ export default function PageInput({
   canBeRemoved,
   isDarkMode,
 }: PageInputProps) {
+  // Get current template for configuration
+  const currentTemplate = template || "simple";
   const charsLeft = MAX_CHARS_PER_PAGE - content.length;
 
   const handleTextChange = (e: ChangeEvent<HTMLTextAreaElement>) => {
@@ -75,34 +78,39 @@ export default function PageInput({
         )}
       </div>
 
-      {/* Optional Title Input */}
-      <input
-        type="text"
-        value={title}
-        onChange={handleTitleChange}
-        className={`w-full p-2 ${isDarkMode ? "bg-gray-700 border-gray-500 text-white placeholder-gray-400" : "bg-white border-gray-300"} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
-        placeholder="Optional Title..."
-      />
+      {/* Template Selector - Show if configured */}
+      {shouldShowInput(currentTemplate, 'templateSelector') && (
+        <div className="space-y-2">
+          <label className={`flex items-center text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}>
+            <Layout className="w-4 h-4 mr-2" />
+            Template
+          </label>
+          <TemplateSelector 
+            selectedTemplate={currentTemplate}
+            onTemplateChange={(templateId) => onTemplateChange(index, templateId)}
+            size={64}
+          />
+        </div>
+      )}
 
-      {/* Template Selector */}
-      <div className="space-y-2">
-        <label className={`flex items-center text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}>
-          <Layout className="w-4 h-4 mr-2" />
-          Template
-        </label>
-        <TemplateSelector 
-          selectedTemplate={template || "simple"}
-          onTemplateChange={(templateId) => onTemplateChange(index, templateId)}
-          size={64}
+      {/* Title Input - Show if configured */}
+      {shouldShowInput(currentTemplate, 'title') && (
+        <input
+          type="text"
+          value={title}
+          onChange={handleTitleChange}
+          className={`w-full p-2 ${isDarkMode ? "bg-gray-700 border-gray-500 text-white placeholder-gray-400" : "bg-white border-gray-300"} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
+          placeholder="Optional Title..."
         />
-      </div>
+      )}
 
-      {/* Background Color Picker */}
-      <div className="space-y-2">
-        <label className={`flex items-center text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}>
-          <Palette className="w-4 h-4 mr-2" />
-          Background Color
-        </label>
+      {/* Background Color Picker - Show if configured */}
+      {shouldShowInput(currentTemplate, 'backgroundColor') && (
+        <div className="space-y-2">
+          <label className={`flex items-center text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}>
+            <Palette className="w-4 h-4 mr-2" />
+            Background Color
+          </label>
         <div className="relative">
           <input
             type="text"
@@ -139,14 +147,16 @@ export default function PageInput({
             title="Click to open color picker"
           ></div>
         </div>
-      </div>
+        </div>
+      )}
 
-      {/* Image Upload */}
-      <div className="space-y-2">
-        <label className={`flex items-center text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}>
-          <ImageIcon className="w-4 h-4 mr-2" />
-          Image (Optional)
-        </label>
+      {/* Image Upload - Show if configured */}
+      {shouldShowInput(currentTemplate, 'image') && (
+        <div className="space-y-2">
+          <label className={`flex items-center text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}>
+            <ImageIcon className="w-4 h-4 mr-2" />
+            Image (Optional)
+          </label>
         
         {image ? (
           <div className="relative">
@@ -192,19 +202,33 @@ export default function PageInput({
             </div>
           </div>
         )}
-      </div>
+        </div>
+      )}
 
-      <textarea
-        value={content}
-        onChange={handleTextChange}
-        className={`w-full h-32 p-3 ${isDarkMode ? "bg-gray-700 border-gray-500 text-white placeholder-gray-400" : "bg-white border-gray-300"} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 resize-none`}
-        placeholder={`Write slide ${index + 1} content here...`}
-      />
-      <div
-        className={`text-right text-sm mt-1 ${charsLeft < 25 ? "text-red-500" : isDarkMode ? "text-gray-400" : "text-slate-500"}`}
-      >
-        {charsLeft} characters remaining
-      </div>
+      {/* Content Textarea - Show if configured */}
+      {shouldShowInput(currentTemplate, 'content') && (
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <label className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}>
+              Content
+            </label>
+            <span className={`text-xs ${charsLeft < 20 ? "text-red-500" : isDarkMode ? "text-gray-400" : "text-slate-500"}`}>
+              {charsLeft} characters left
+            </span>
+          </div>
+          <textarea
+            value={content}
+            onChange={handleTextChange}
+            className={`w-full h-32 p-3 ${isDarkMode ? "bg-gray-700 border-gray-500 text-white placeholder-gray-400" : "bg-white border-gray-300"} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 resize-none`}
+            placeholder={`Write slide ${index + 1} content here...`}
+          />
+          <div
+            className={`text-right text-sm mt-1 ${charsLeft < 25 ? "text-red-500" : isDarkMode ? "text-gray-400" : "text-slate-500"}`}
+          >
+            {charsLeft} characters remaining
+          </div>
+        </div>
+      )}
     </div>
   );
 }

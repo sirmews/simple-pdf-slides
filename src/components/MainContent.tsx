@@ -1,4 +1,5 @@
 import PageInput from './PageInput';
+import FeatureAlert from './FeatureAlert';
 import { useAppData } from '../hooks/useAppData';
 import { usePageManagement } from '../hooks/usePageManagement';
 import { usePDFGeneration } from '../hooks/usePDFGeneration';
@@ -74,6 +75,12 @@ export default function MainContent({ isDarkMode }: MainContentProps) {
               >
                 Now with emoji support! Express yourself professionally 🚀
               </p>
+              
+              <FeatureAlert
+                isDarkMode={isDarkMode}
+                message="New: Full-page background image template and improved template selection!"
+                onDismiss={() => {/* Could store in localStorage to persist dismissal */}}
+              />
             </div>
           </div>
 

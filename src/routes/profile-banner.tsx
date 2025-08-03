@@ -27,10 +27,10 @@ function ProfileBanner() {
     fileInputRef.current?.click()
   }
 
-  const [showSeekingClients, setShowSeekingClients] = useState(false)
+  const [selectedBanner, setSelectedBanner] = useState<string | null>(null)
 
-  const toggleSeekingClients = () => {
-    setShowSeekingClients(!showSeekingClients)
+  const toggleBanner = (bannerType: string) => {
+    setSelectedBanner(selectedBanner === bannerType ? null : bannerType)
   }
 
   const handleSaveImage = async () => {
@@ -68,8 +68,8 @@ function ProfileBanner() {
         ctx.drawImage(img, 0, 0, size, size)
         ctx.restore()
         
-        // Add seeking clients overlay if enabled
-        if (showSeekingClients) {
+        // Add banner overlays if selected
+        if (selectedBanner === 'seeking-clients') {
           const overlayImg = new Image()
           overlayImg.crossOrigin = 'anonymous'
           
@@ -87,6 +87,46 @@ function ProfileBanner() {
             overlayImg.onerror = () => overlayResolve() // Continue even if overlay fails to load
             overlayImg.src = '/assets/seek-clients.png'
           })
+        } else if (selectedBanner === 'button-effect') {
+          ctx.save()
+          
+          // Create enhanced button effect without white border
+          // Add pronounced shadow (simulate drop shadow by drawing multiple offset circles)
+          ctx.globalCompositeOperation = 'destination-over'
+          for (let i = 0; i < 15; i++) {
+            ctx.beginPath()
+            ctx.arc(size / 2 + i/2, size / 2 + i/2, size / 2 + i, 0, Math.PI * 2)
+            ctx.fillStyle = `rgba(0, 0, 0, ${0.15 - (i * 0.01)})`
+            ctx.fill()
+          }
+          ctx.globalCompositeOperation = 'source-over'
+          
+          // Create pronounced inset effect with gradient overlay
+          const insetGradient = ctx.createRadialGradient(size/3, size/3, 0, size/2, size/2, size/2)
+          insetGradient.addColorStop(0, 'rgba(255, 255, 255, 0.4)')
+          insetGradient.addColorStop(0.7, 'rgba(255, 255, 255, 0.1)')
+          insetGradient.addColorStop(1, 'rgba(0, 0, 0, 0.2)')
+          
+          ctx.globalCompositeOperation = 'overlay'
+          ctx.fillStyle = insetGradient
+          ctx.beginPath()
+          ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2)
+          ctx.fill()
+          
+          // Add inner shadow effect
+          const innerShadowGradient = ctx.createRadialGradient(size/2, size/2, size/2 - 20, size/2, size/2, size/2)
+          innerShadowGradient.addColorStop(0, 'rgba(0, 0, 0, 0)')
+          innerShadowGradient.addColorStop(0.9, 'rgba(0, 0, 0, 0)')
+          innerShadowGradient.addColorStop(1, 'rgba(0, 0, 0, 0.3)')
+          
+          ctx.globalCompositeOperation = 'multiply'
+          ctx.fillStyle = innerShadowGradient
+          ctx.beginPath()
+          ctx.arc(size / 2, size / 2, size / 2, 0, Math.PI * 2)
+          ctx.fill()
+          
+          ctx.globalCompositeOperation = 'source-over'
+          ctx.restore()
         }
         
         // Convert canvas to blob and download
@@ -115,7 +155,7 @@ function ProfileBanner() {
         <div className="card-header">
           <div>
             <h1 className="heading-primary">
-              Profile Banner Creator
+              Kinda professional avatar
             </h1>
             <p className="text-secondary mt-2">
               Make your LinkedIn profile image stand out and be a little bit different from the rest. Not too different and still professional.
@@ -148,13 +188,26 @@ function ProfileBanner() {
                           className="w-full h-full object-cover rounded-full"
                         />
                         
-                        {/* Seeking Clients overlay */}
-                        {showSeekingClients && (
+                        {/* Banner overlays */}
+                        {selectedBanner === 'seeking-clients' && (
                           <img
                             src="/assets/seek-clients.png"
                             alt="Seeking Clients"
                             className="absolute inset-0 w-full h-full object-cover rounded-full pointer-events-none"
                           />
+                        )}
+                        
+                        {selectedBanner === 'button-effect' && (
+                          <div className="absolute inset-0 rounded-full pointer-events-none">
+                            {/* Enhanced button effect with shadow and depth */}
+                            <div 
+                              className="absolute inset-0 rounded-full"
+                              style={{
+                                boxShadow: '0 8px 20px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.4), inset 0 -2px 4px rgba(0, 0, 0, 0.2)',
+                                background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, rgba(0,0,0,0.1) 100%)'
+                              }}
+                            ></div>
+                          </div>
                         )}
                       </div>
                     ) : (
@@ -183,9 +236,9 @@ function ProfileBanner() {
               <h3 className="text-lg font-semibold text-primary">Banner Options</h3>
               
               <button
-                onClick={toggleSeekingClients}
+                onClick={() => toggleBanner('seeking-clients')}
                 className={`w-full p-4 border-2 rounded-lg transition-all duration-200 flex items-center gap-3 ${
-                  showSeekingClients 
+                  selectedBanner === 'seeking-clients' 
                     ? 'border-blue-500 bg-blue-50' 
                     : isDarkMode 
                       ? 'border-gray-600 hover:border-gray-500'
@@ -197,18 +250,49 @@ function ProfileBanner() {
                 </div>
                 <div className="text-left">
                   <div className={`font-semibold ${
-                    showSeekingClients 
+                    selectedBanner === 'seeking-clients' 
                       ? 'text-blue-700' 
                       : 'text-primary'
                   }`}>
                     Seeking Clients Banner
                   </div>
                   <div className={`text-sm ${
-                    showSeekingClients 
+                    selectedBanner === 'seeking-clients' 
                       ? 'text-blue-600' 
                       : 'text-secondary'
                   }`}>
                     Add "#SEEKINGCLIENTS" overlay to your profile
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => toggleBanner('button-effect')}
+                className={`w-full p-4 border-2 rounded-lg transition-all duration-200 flex items-center gap-3 ${
+                  selectedBanner === 'button-effect' 
+                    ? 'border-blue-500 bg-blue-50' 
+                    : isDarkMode 
+                      ? 'border-gray-600 hover:border-gray-500'
+                      : 'border-slate-300 hover:border-slate-400'
+                }`}
+              >
+                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white font-bold border-2 border-white shadow-md">
+                  ⚪
+                </div>
+                <div className="text-left">
+                  <div className={`font-semibold ${
+                    selectedBanner === 'button-effect' 
+                      ? 'text-blue-700' 
+                      : 'text-primary'
+                  }`}>
+                    Button Effect
+                  </div>
+                  <div className={`text-sm ${
+                    selectedBanner === 'button-effect' 
+                      ? 'text-blue-600' 
+                      : 'text-secondary'
+                  }`}>
+                    Add professional button-like border and shadow
                   </div>
                 </div>
               </button>

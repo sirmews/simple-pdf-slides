@@ -19,5 +19,25 @@ export default defineConfig({
   },
   define: {
     global: 'globalThis',
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Separate React and React DOM into their own chunk
+          'react-vendor': ['react', 'react-dom'],
+          // Separate PDF renderer into its own chunk (likely the largest)
+          'pdf-renderer': ['@react-pdf/renderer'],
+          // Separate TanStack Router into its own chunk
+          'router': ['@tanstack/react-router'],
+          // Separate UI icons into their own chunk
+          'icons': ['lucide-react'],
+          // Separate utility libraries
+          'utils': ['nanoid']
+        }
+      }
+    },
+    // Increase chunk size warning limit to reduce noise for intentionally large chunks
+    chunkSizeWarningLimit: 1000
   }
 })

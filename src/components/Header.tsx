@@ -17,7 +17,7 @@ export default function Header({ isDarkMode, toggleDarkMode }: HeaderProps) {
               isDarkMode ? "text-white" : "text-slate-900"
             }`}
           >
-            Simple PDF Slides
+            Professional Carousels
           </Link>
           <Link
             to="/profile-banner"
@@ -25,7 +25,7 @@ export default function Header({ isDarkMode, toggleDarkMode }: HeaderProps) {
               isDarkMode ? "text-gray-300" : "text-slate-600"
             }`}
           >
-            Profile Banner
+            Professional Avatar
           </Link>
           <Link
             to="/help"

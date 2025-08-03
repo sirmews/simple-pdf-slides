@@ -54,27 +54,19 @@ export default function MainContent({ isDarkMode }: MainContentProps) {
         <div
           id="pdf-slides-main-card"
           data-component="PDFSlidesMainCard"
-          className={`${isDarkMode ? "bg-gray-800" : "bg-white"} rounded-lg border ${isDarkMode ? "border-gray-700" : "border-gray-200"} transition-colors duration-200`}
+          className="card"
         >
-          <div
-            className={`p-6 md:p-8 border-b ${isDarkMode ? "border-gray-700" : "border-slate-200"}`}
-          >
+          <div className="card-header">
             <div>
-              <h1
-                className={`text-2xl sm:text-3xl font-bold ${isDarkMode ? "text-white" : "text-slate-800"}`}
-              >
+              <h1 className="heading-primary">
                 Kinda professional carousels
               </h1>
-              <p
-                className={`${isDarkMode ? "text-gray-400" : "text-slate-500"} mt-2`}
-              >
+              <p className="text-secondary mt-2">
                 Y'know those awful carousels we're forced to navigate in LinkedIn?
                 <br />
                 Be the problem, not the solution. Here's a solution
               </p>
-              <p
-                className={`${isDarkMode ? "text-gray-400" : "text-slate-500"} mt-2`}
-              >
+              <p className="text-secondary mt-2">
                 Now with emoji support! Express yourself professionally 🚀
               </p>
               
@@ -86,7 +78,7 @@ export default function MainContent({ isDarkMode }: MainContentProps) {
             </div>
           </div>
 
-          <div className="p-4 md:p-8 space-y-6">
+          <div className="card-content">
             <div className="space-y-4">
               {pages.map((page, index) => (
                 <PageInput
@@ -112,11 +104,7 @@ export default function MainContent({ isDarkMode }: MainContentProps) {
 
             <button
               onClick={handleAddPage}
-              className={`w-full p-4 border-2 border-dashed rounded-lg transition-colors duration-200 ${
-                isDarkMode
-                  ? "border-gray-600 hover:border-gray-500 text-gray-400 hover:text-gray-300"
-                  : "border-slate-300 hover:border-slate-400 text-slate-500 hover:text-slate-600"
-              }`}
+              className="btn-outline w-full"
             >
               <PlusCircle className="w-5 h-5 mx-auto mb-2" />
               Add New Slide
@@ -126,7 +114,7 @@ export default function MainContent({ isDarkMode }: MainContentProps) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label
-                    className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}
+                    className="label-text block mb-2"
                   >
                     <User className="w-4 h-4 inline mr-2" />
                     Author Name (optional)
@@ -136,17 +124,13 @@ export default function MainContent({ isDarkMode }: MainContentProps) {
                     value={authorName}
                     onChange={(e) => updateAuthorName(e.target.value)}
                     placeholder="Your name"
-                    className={`w-full p-3 border rounded-lg transition-colors duration-200 ${
-                      isDarkMode
-                        ? "bg-gray-700 border-gray-600 text-white placeholder-gray-400 focus:border-blue-500"
-                        : "bg-white border-slate-300 text-slate-900 placeholder-slate-400 focus:border-blue-500"
-                    } focus:outline-none focus:ring-2 focus:ring-blue-500/20`}
+                    className="input-field"
                   />
                 </div>
 
                 <div>
                   <label
-                    className={`block text-sm font-medium mb-2 ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}
+                    className="label-text block mb-2"
                   >
                     <Type className="w-4 h-4 inline mr-2" />
                     Font Family
@@ -154,11 +138,7 @@ export default function MainContent({ isDarkMode }: MainContentProps) {
                   <select
                     value={font}
                     onChange={(e) => updateFont(e.target.value)}
-                    className={`w-full p-3 border rounded-lg transition-colors duration-200 ${
-                      isDarkMode
-                        ? "bg-gray-700 border-gray-600 text-white focus:border-blue-500"
-                        : "bg-white border-slate-300 text-slate-900 focus:border-blue-500"
-                    } focus:outline-none focus:ring-2 focus:ring-blue-500/20`}
+                    className="input-field"
                   >
                     <option value="Inter">Inter</option>
                     <option value="Helvetica">Helvetica</option>
@@ -178,7 +158,7 @@ export default function MainContent({ isDarkMode }: MainContentProps) {
                 />
                 <label
                   htmlFor="showPageNumbers"
-                  className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}
+                  className="label-text"
                 >
                   Show page numbers
                 </label>
@@ -188,15 +168,7 @@ export default function MainContent({ isDarkMode }: MainContentProps) {
             <button
               onClick={handleGeneratePdf}
               disabled={isGeneratingPdf}
-              className={`w-full py-4 px-6 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center ${
-                isGeneratingPdf
-                  ? isDarkMode
-                    ? "bg-gray-600 text-gray-400 cursor-not-allowed"
-                    : "bg-slate-300 text-slate-500 cursor-not-allowed"
-                  : isDarkMode
-                  ? "bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl"
-                  : "bg-blue-600 hover:bg-blue-700 text-white shadow-lg hover:shadow-xl"
-              }`}
+              className="btn-primary w-full"
             >
               {isGeneratingPdf ? (
                 <>

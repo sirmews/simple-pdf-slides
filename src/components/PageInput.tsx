@@ -59,18 +59,18 @@ export default function PageInput({
 
   return (
     <div
-      className={`relative p-4 ${isDarkMode ? "bg-gray-800" : "bg-gray-50"} border ${isDarkMode ? "border-gray-600" : "border-gray-200"} rounded-lg transition-colors duration-200 space-y-3`}
+      className="page-input-container"
     >
       <div className="flex justify-between items-center">
         <label
-          className={`text-sm font-bold ${isDarkMode ? "text-gray-300" : "text-slate-600"}`}
+          className="text-sm font-bold text-primary"
         >
           Slide {index + 1}
         </label>
         {canBeRemoved && (
           <button
             onClick={() => onRemove(index)}
-            className={`${isDarkMode ? "text-gray-400 hover:text-red-400" : "text-slate-400 hover:text-red-500"} transition-colors`}
+            className="text-muted hover:text-red-500 transition-colors"
             title={index === 0 ? "Clear Slide Content" : "Remove Slide"}
           >
             <XCircle className="w-5 h-5" />
@@ -81,7 +81,7 @@ export default function PageInput({
       {/* Template Selector - Show if configured */}
       {shouldShowInput(currentTemplate, 'templateSelector') && (
         <div className="space-y-2">
-          <label className={`flex items-center text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}>
+          <label className="flex items-center label-text">
             <Layout className="w-4 h-4 mr-2" />
             Template
           </label>
@@ -99,7 +99,7 @@ export default function PageInput({
           type="text"
           value={title}
           onChange={handleTitleChange}
-          className={`w-full p-2 ${isDarkMode ? "bg-gray-700 border-gray-500 text-white placeholder-gray-400" : "bg-white border-gray-300"} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
+          className="input-field"
           placeholder="Optional Title..."
         />
       )}
@@ -107,7 +107,7 @@ export default function PageInput({
       {/* Background Color Picker - Show if configured */}
       {shouldShowInput(currentTemplate, 'backgroundColor') && (
         <div className="space-y-2">
-          <label className={`flex items-center text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}>
+          <label className="flex items-center label-text">
             <Palette className="w-4 h-4 mr-2" />
             Background Color
           </label>
@@ -130,7 +130,7 @@ export default function PageInput({
                 onBackgroundColorChange(index, backgroundColor);
               }
             }}
-            className={`w-full p-2 pr-12 ${isDarkMode ? "bg-gray-700 border-gray-500 text-white" : "bg-white border-gray-300"} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200`}
+            className="input-field pr-12"
             placeholder="#e0f2fe"
           />
           <input
@@ -141,7 +141,7 @@ export default function PageInput({
             className="absolute top-0 right-0 h-full w-12 opacity-0 cursor-pointer"
           />
           <div
-            className={`absolute top-1/2 right-3 transform -translate-y-1/2 w-6 h-6 rounded-md border ${isDarkMode ? "border-gray-600" : "border-slate-300"} cursor-pointer`}
+            className="absolute top-1/2 right-3 transform -translate-y-1/2 w-6 h-6 rounded-md border border-slate-300 dark:border-gray-600 cursor-pointer"
             style={{ backgroundColor: backgroundColor }}
             onClick={() => document.getElementById(`color-picker-${index}`)?.click()}
             title="Click to open color picker"
@@ -153,7 +153,7 @@ export default function PageInput({
       {/* Image Upload - Show if configured */}
       {shouldShowInput(currentTemplate, 'image') && (
         <div className="space-y-2">
-          <label className={`flex items-center text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}>
+          <label className="flex items-center label-text">
             <ImageIcon className="w-4 h-4 mr-2" />
             Image (Optional)
           </label>
@@ -185,17 +185,13 @@ export default function PageInput({
               }}
               className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
             />
-            <div className={`flex items-center justify-center p-8 border-2 border-dashed rounded-lg transition-colors ${
-              isDarkMode 
-                ? "border-gray-600 hover:border-gray-500 bg-gray-700/50" 
-                : "border-gray-300 hover:border-gray-400 bg-gray-50"
-            }`}>
+            <div className="upload-area">
               <div className="text-center">
-                <Upload className={`w-8 h-8 mx-auto mb-2 ${isDarkMode ? "text-gray-400" : "text-gray-500"}`} />
-                <p className={`text-sm ${isDarkMode ? "text-gray-400" : "text-gray-600"}`}>
+                <Upload className="w-8 h-8 mx-auto mb-2 text-muted" />
+                <p className="text-sm text-secondary">
                   Click to upload an image
                 </p>
-                <p className={`text-xs ${isDarkMode ? "text-gray-500" : "text-gray-500"}`}>
+                <p className="text-xs text-muted">
                   PNG, JPG, GIF up to 10MB
                 </p>
               </div>
@@ -209,21 +205,21 @@ export default function PageInput({
       {shouldShowInput(currentTemplate, 'content') && (
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <label className={`text-sm font-medium ${isDarkMode ? "text-gray-300" : "text-slate-700"}`}>
+            <label className="label-text">
               Content
             </label>
-            <span className={`text-xs ${charsLeft < 20 ? "text-red-500" : isDarkMode ? "text-gray-400" : "text-slate-500"}`}>
+            <span className={`text-xs ${charsLeft < 20 ? "text-red-500" : "text-muted"}`}>
               {charsLeft} characters left
             </span>
           </div>
           <textarea
             value={content}
             onChange={handleTextChange}
-            className={`w-full h-32 p-3 ${isDarkMode ? "bg-gray-700 border-gray-500 text-white placeholder-gray-400" : "bg-white border-gray-300"} rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 resize-none`}
+            className="textarea-field h-32"
             placeholder={`Write slide ${index + 1} content here...`}
           />
           <div
-            className={`text-right text-sm mt-1 ${charsLeft < 25 ? "text-red-500" : isDarkMode ? "text-gray-400" : "text-slate-500"}`}
+            className={`text-right text-sm mt-1 ${charsLeft < 25 ? "text-red-500" : "text-muted"}`}
           >
             {charsLeft} characters remaining
           </div>

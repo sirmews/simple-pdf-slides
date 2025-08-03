@@ -2,6 +2,228 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Design System - Color Tokens */
+:root {
+  /* Background Colors - Soft, warm palette */
+  --bg-primary: #fefcf8;      /* Warm off-white */
+  --bg-secondary: #faf8f4;    /* Light cream */
+  --bg-card: #fefefe;         /* Very soft white */
+  --bg-input: #fefefe;        /* Very soft white */
+  --bg-button: #6366f1;       /* Soft indigo */
+  --bg-button-hover: #4f46e5; /* Deeper indigo */
+  --bg-disabled: #e8e5e1;     /* Warm gray */
+  
+  /* Text Colors - Softer contrast */
+  --text-primary: #2d2922;    /* Warm dark brown */
+  --text-secondary: #6b6558;  /* Warm mid-tone */
+  --text-muted: #9b9488;      /* Warm light gray */
+  --text-label: #524c42;      /* Warm dark gray */
+  --text-button: #ffffff;     /* Pure white for contrast on buttons */
+  --text-disabled: #a8a296;   /* Warm muted */
+  
+  /* Border Colors - Warm, subtle */
+  --border-primary: #e6e2dc;  /* Warm light border */
+  --border-secondary: #d4cfc7; /* Slightly darker warm border */
+  --border-focus: #6366f1;    /* Soft indigo for focus */
+  --border-card: #ede9e3;     /* Very light warm border */
+  
+  /* Alert Colors - Softer blue tones */
+  --alert-bg: #f0f4ff;        /* Very light blue */
+  --alert-text: #3730a3;      /* Deep indigo */
+  --alert-border: #818cf8;    /* Soft indigo */
+  --alert-button: #4f46e5;    /* Indigo */
+  --alert-button-hover: #3730a3; /* Deep indigo */
+}
+
+/* Dark Theme */
+.dark {
+  /* Background Colors */
+  --bg-primary: #0f172a;      /* slate-900 */
+  --bg-secondary: #1e293b;    /* slate-800 */
+  --bg-card: #1f2937;         /* gray-800 */
+  --bg-input: #374151;        /* gray-700 */
+  --bg-button: #3b82f6;       /* blue-600 */
+  --bg-button-hover: #2563eb; /* blue-700 */
+  --bg-disabled: #4b5563;     /* gray-600 */
+  
+  /* Text Colors */
+  --text-primary: #ffffff;
+  --text-secondary: #9ca3af;  /* gray-400 */
+  --text-muted: #6b7280;      /* gray-500 */
+  --text-label: #d1d5db;      /* gray-300 */
+  --text-button: #ffffff;
+  --text-disabled: #9ca3af;   /* gray-400 */
+  
+  /* Border Colors */
+  --border-primary: #4b5563;  /* gray-600 */
+  --border-secondary: #6b7280; /* gray-500 */
+  --border-focus: #3b82f6;    /* blue-600 */
+  --border-card: #4b5563;     /* gray-600 */
+  
+  /* Alert Colors */
+  --alert-bg: rgba(30, 58, 138, 0.3); /* blue-900/30 */
+  --alert-text: #93c5fd;      /* blue-300 */
+  --alert-border: #60a5fa;    /* blue-400 */
+  --alert-button: #3b82f6;    /* blue-600 */
+  --alert-button-hover: rgba(30, 58, 138, 0.5); /* blue-800/50 */
+}
+
+/* Utility Classes using Design Tokens */
+@layer components {
+  /* Card Components */
+  .card {
+    @apply rounded-lg border transition-colors duration-200;
+    background-color: var(--bg-card);
+    border-color: var(--border-card);
+  }
+  
+  .card-header {
+    @apply p-6 md:p-8 border-b;
+    border-color: var(--border-secondary);
+  }
+  
+  .card-content {
+    @apply p-4 md:p-8 space-y-6;
+  }
+  
+  /* Input Components */
+  .input-field {
+    @apply w-full p-3 rounded-md border focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors duration-200;
+    background-color: var(--bg-input);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+  }
+  
+  .input-field::placeholder {
+    color: var(--text-muted);
+  }
+  
+  .input-field:focus {
+    border-color: var(--border-focus);
+  }
+  
+  .textarea-field {
+    @apply w-full p-3 rounded-md border focus:ring-2 focus:ring-blue-500 focus:outline-none transition-colors duration-200 resize-none;
+    background-color: var(--bg-input);
+    border-color: var(--border-primary);
+    color: var(--text-primary);
+  }
+  
+  .textarea-field::placeholder {
+    color: var(--text-muted);
+  }
+  
+  .textarea-field:focus {
+    border-color: var(--border-focus);
+  }
+  
+  /* Text Components */
+  .text-primary {
+    color: var(--text-primary);
+  }
+  
+  .text-secondary {
+    color: var(--text-secondary);
+  }
+  
+  .text-muted {
+    color: var(--text-muted);
+  }
+  
+  .label-text {
+    @apply text-sm font-medium;
+    color: var(--text-label);
+  }
+  
+  .heading-primary {
+    @apply text-2xl sm:text-3xl font-bold;
+    color: var(--text-primary);
+  }
+  
+  /* Button Components */
+  .btn-primary {
+    @apply py-4 px-6 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center shadow-lg;
+    background-color: var(--bg-button);
+    color: var(--text-button);
+  }
+  
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--bg-button-hover);
+    @apply shadow-xl;
+  }
+  
+  .btn-primary:disabled {
+    background-color: var(--bg-disabled);
+    color: var(--text-disabled);
+    @apply cursor-not-allowed;
+  }
+  
+  .btn-outline {
+    @apply p-4 border-2 border-dashed rounded-lg transition-colors duration-200;
+    border-color: var(--border-primary);
+    color: var(--text-secondary);
+  }
+  
+  .btn-outline:hover {
+    border-color: var(--border-secondary);
+    color: var(--text-label);
+  }
+  
+  /* Alert Components */
+  .alert {
+    @apply flex items-center justify-between p-3 mt-3 rounded-lg border-l-4 transition-colors duration-200;
+    background-color: var(--alert-bg);
+    color: var(--alert-text);
+    border-color: var(--alert-border);
+  }
+  
+  .alert-button {
+    @apply ml-4 p-1 rounded-full transition-colors duration-200;
+    color: var(--alert-button);
+  }
+  
+  .alert-button:hover {
+    background-color: var(--alert-button-hover);
+    color: var(--alert-text);
+  }
+  
+  /* Page Input Components */
+  .page-input-container {
+    @apply relative p-4 rounded-lg border transition-colors duration-200 space-y-3;
+    background-color: var(--bg-secondary);
+    border-color: var(--border-card);
+  }
+  
+  .upload-area {
+    @apply flex items-center justify-center p-8 border-2 border-dashed rounded-lg transition-colors;
+    border-color: var(--border-primary);
+    background-color: var(--bg-secondary);
+  }
+  
+  .upload-area:hover {
+    border-color: var(--border-secondary);
+  }
+  
+  /* Template Selector Components */
+  .template-button {
+    @apply flex flex-col items-center justify-center gap-2 p-3 rounded-md border transition-colors w-24 h-24 min-w-24 min-h-24 max-w-24 max-h-24;
+    border-color: var(--border-primary);
+    color: var(--text-secondary);
+    background-color: var(--bg-card);
+  }
+  
+  .template-button:hover {
+    border-color: var(--border-secondary);
+    color: var(--text-label);
+  }
+  
+  .template-button.selected {
+    border-color: var(--border-focus);
+    background-color: var(--alert-bg);
+    color: var(--alert-text);
+  }
+}
+
 /* Improve emoji rendering */
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',

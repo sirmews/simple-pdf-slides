@@ -1,4 +1,5 @@
 import { Moon, Sun } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 interface HeaderProps {
   isDarkMode: boolean;
@@ -10,30 +11,30 @@ export default function Header({ isDarkMode, toggleDarkMode }: HeaderProps) {
     <header className="bg-transparent">
       <div className="flex justify-between items-center p-4">
         <nav className="flex items-center space-x-6">
-          <a
-            href="/"
-            className={`text-sm font-medium transition-colors duration-200 hover:opacity-80 ${
+          <Link
+            to="/"
+            className={`text-sm font-medium transition-colors duration-200 hover:opacity-80 [&.active]:opacity-100 [&.active]:underline ${
               isDarkMode ? "text-white" : "text-slate-900"
             }`}
           >
             Simple PDF Slides
-          </a>
-          <a
-            href="#"
-            className={`text-sm transition-colors duration-200 hover:opacity-80 ${
+          </Link>
+          <Link
+            to="/profile-banner"
+            className={`text-sm transition-colors duration-200 hover:opacity-80 [&.active]:opacity-100 [&.active]:underline ${
               isDarkMode ? "text-gray-300" : "text-slate-600"
             }`}
           >
-            Resources
-          </a>
-          <a
-            href="#"
-            className={`text-sm transition-colors duration-200 hover:opacity-80 ${
+            Profile Banner
+          </Link>
+          <Link
+            to="/help"
+            className={`text-sm transition-colors duration-200 hover:opacity-80 [&.active]:opacity-100 [&.active]:underline ${
               isDarkMode ? "text-gray-300" : "text-slate-600"
             }`}
           >
             Help
-          </a>
+          </Link>
         </nav>
         <button
           onClick={toggleDarkMode}

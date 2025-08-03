@@ -27,14 +27,7 @@ const TemplateSelector: React.FC<TemplateSelectorProps> = ({
           <button
             key={template.id}
             onClick={() => onTemplateChange(template.id)}
-            className={`
-              flex flex-col items-center justify-center gap-2 p-3 rounded-md border transition-colors
-              w-24 h-24 min-w-24 min-h-24 max-w-24 max-h-24
-              ${selectedTemplate === template.id
-                ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400"
-                : "border-gray-200 hover:border-gray-300 dark:border-gray-600 dark:hover:border-gray-500 text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
-              }
-            `}
+            className={`template-button ${selectedTemplate === template.id ? 'selected' : ''}`}
             title={template.description}
           >
             <IconComponent size={24} className="flex-shrink-0" />

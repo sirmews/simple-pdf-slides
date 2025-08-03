@@ -49,7 +49,7 @@ export default function MainContent({ isDarkMode }: MainContentProps) {
   };
 
   return (
-    <main className="flex items-center justify-center min-h-screen pt-16 pb-20">
+    <main className="flex items-center justify-center min-h-screen pt-6 pb-20">
       <div className="w-full max-w-2xl mx-auto md:px-8">
         <div
           id="pdf-slides-main-card"
